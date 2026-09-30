@@ -1,0 +1,11 @@
+experiment_id,status,device,gpu_count,cpu_threads,wall_seconds,gpu_hours,estimated_cost_usd,tokens_processed,peak_memory_mb,precision
+mqar_attn_a4of4_block_end_d64_L32_lr1e-3_s0_1916e94c,completed,cpu,0,2,231.05,0.0,0.0,6144000,732.3,fp32
+mqar_attn_a4of4_block_end_d64_L32_lr3e-3_s0_226bb60d,completed,cpu,0,2,242.2,0.0,0.0,6144000,732.1,fp32
+mqar_mamba2_a2of4_block_end_d64_L32_lr1e-3_s0_68fef0e5,completed,cpu,0,2,375.65,0.0,0.0,6144000,779.9,fp32
+mqar_mamba2_a2of4_block_end_d64_L32_lr3e-3_s0_b34a354c,completed,cpu,0,2,383.37,0.0,0.0,6144000,780.3,fp32
+mqar_gdn_a2of4_block_end_d64_L32_lr1e-3_s0_0d2138c4,completed,cpu,0,2,389.29,0.0,0.0,6144000,779.9,fp32
+mqar_gdn_a2of4_block_end_d64_L32_lr3e-3_s0_10f08627,completed,cpu,0,2,390.33,0.0,0.0,6144000,780.3,fp32
+mqar_mamba2_a0of4_block_end_d64_L32_lr1e-3_s0_0ee3f59a,completed,cpu,0,2,522.63,0.0,0.0,6144000,813.3,fp32
+mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310,completed,cpu,0,2,524.3,0.0,0.0,6144000,816.3,fp32
+mqar_gdn_a0of4_block_end_d64_L32_lr1e-3_s0_839d49f7,completed,cpu,0,2,535.35,0.0,0.0,6144000,813.3,fp32
+mqar_gdn_a0of4_block_end_d64_L32_lr3e-3_s0_5318fa66,completed,cpu,0,2,534.7,0.0,0.0,6144000,816.3,fp32

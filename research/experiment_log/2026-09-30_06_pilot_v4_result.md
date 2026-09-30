@@ -1,0 +1,53 @@
+# 2026-09-30 · 06 · Pilot v4 result: MQAR at r ∈ {0, 1/2, 1}, 4 layers (PILOT, one seed)
+
+Sweep `configs/sweeps/pilot_mqar_v4.yaml`, tag `pilot_mqar_v4`, 10 runs, all completed. CPU only: 1.15 wall-hours,
+61.4M training tokens, $0 billed (`artifacts/compute_summary.csv`).
+Analysis: `attnratio analyze pilot_mqar_v4` → `artifacts/analysis/pilot_mqar_v4/`, figure
+`figures/pilot_mqar_v4_mqar_token_accuracy.png`.
+
+## Hypothesis (from entry 03, carried over)
+
+Pure attention near ceiling; pure Mamba-2 and pure Gated DeltaNet fall with P, Gated DeltaNet above Mamba-2
+despite its smaller state (512 vs 1,152 entries per layer); r = 1/2 within 0.05 of r = 1.
+
+## Observed result (MEASURED, test split, token accuracy, LR selected per cell on validation, 1 seed)
+
+95% intervals resample test examples only (one seed), so they describe evaluation noise, not seed-to-seed variation.
+
+| architecture | r | P = 2 | P = 4 | P = 6 | P = 8 |
+|---|---|---|---|---|---|
+| attention | 1 | 1.000 | 1.000 | 1.000 | 0.999 |
+| Mamba-2 hybrid | 1/2 | 0.998 | 0.990 | 0.987 | 0.973 [0.968, 0.977] |
+| Mamba-2 | 0 | 0.752 [0.726, 0.777] | 0.462 [0.449, 0.477] | 0.326 [0.315, 0.337] | 0.264 [0.256, 0.273] |
+| Gated DeltaNet hybrid | 1/2 | 1.000 | 1.000 | 1.000 | 1.000 |
+| Gated DeltaNet | 0 | 1.000 | 1.000 | 0.999 | 0.995 [0.993, 0.997] |
+
+Chance is 1/64 ≈ 0.016; "any in-context value" is ≈ 1/P.
+
+Learning-rate sensitivity (validation, mean over P): 1e-3 left Mamba-2 r = 1/2 and r = 0 on the 1/P plateau
+(0.29 both); 3e-3 won every cell.
+
+## Interpretation
+
+1. At this difficulty (L = 32, P ≤ 8, d = 64) the answer to "how much attention" depends on the non-attention
+   mixer. Pure Gated DeltaNet is at ceiling with no attention; pure Mamba-2 fails and degrades with P, and two
+   attention layers out of four recover it to within 0.03 of pure attention.
+2. The Mamba-2 deficit is not explained by state size: its recurrent state per layer is 2.25× Gated DeltaNet's.
+   It is consistent with the mechanism difference (delta-rule overwrite and normalised-key reads versus decay-only
+   accumulation), but this pilot does not isolate the mechanism.
+3. The pre-registered expectation "Gated DeltaNet above Mamba-2" held. "Gated DeltaNet falls with P" did not
+   at P ≤ 8: the task is too easy for it, so this setting cannot measure Gated DeltaNet's attention need.
+
+## Potential confounds
+
+- One seed.
+- **LR grid edge:** 3e-3 was the top of the grid and won every cell; Mamba-2 r = 0 might improve at a higher LR.
+  Extension to 1e-2 launched (`configs/sweeps/pilot_mqar_v4_lr.yaml`, same tag).
+- Mamba-2 r = 0 plateaued from step 1,500 to 3,000 (validation 0.71 → 0.73 at P = 2), so "more steps" is not
+  the obvious fix, but longer training was not tested.
+- 4 layers only; r = 1/2 is two attention layers, so ratio and count are not separable here.
+
+## Decision
+
+Before seeds: finish the LR extension. Then: 3 seeds for the Mamba-2 arm; a harder regime (P up to 16 at L = 64
+with 4 layers, untested for trainability) to find where Gated DeltaNet starts needing attention.

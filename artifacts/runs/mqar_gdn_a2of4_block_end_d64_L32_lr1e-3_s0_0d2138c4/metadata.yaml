@@ -1,0 +1,96 @@
+experiment_id: mqar_gdn_a2of4_block_end_d64_L32_lr1e-3_s0_0d2138c4
+git_commit: a8b95fea030f89a6df516f3a00c7c9b150e0388c
+git_dirty: false
+model_config:
+  family: gdn
+  vocab_size: 144
+  d_model: 64
+  n_layers: 4
+  n_attn: 2
+  placement: block_end
+  attn_heads: 2
+  rope_fraction: 1.0
+  mlp_ratio: 2.0
+  mamba_head_dim: 8
+  mamba_d_state: 16
+  gdn_heads: 4
+  d_conv: 4
+  chunk: 32
+  extra: {}
+  attention_ratio: 0.5
+dataset_config:
+  task: mqar
+  train:
+  - seq_len: 32
+    difficulty:
+      num_pairs: 2
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 4
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 6
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 8
+      key_vocab: 64
+      value_vocab: 64
+  eval:
+  - seq_len: 32
+    difficulty:
+      num_pairs: 2
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 4
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 6
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 8
+      key_vocab: 64
+      value_vocab: 64
+attention_ratio: 0.5
+attention_placement: block_end
+architecture: gdn
+layer_types: SASA
+seed: 0
+parameter_count: 175984
+non_embedding_parameters: 166768
+attention_mixer_params_per_layer: 16384
+other_mixer_params_per_layer: 17560
+mixer_param_ratio_other_over_attention: 1.07177734375
+recurrent_state_numel_per_layer: 512
+kv_cache_numel_at_seq_len: 8192
+training_tokens: 6144000
+hardware:
+  device: cpu
+  cpu_threads: 2
+  gpu_count: 0
+  host: vm
+precision: fp32
+start_time: '2026-09-30T22:57:00.703345+00:00'
+status: completed
+tags:
+- pilot_mqar_v4
+end_time: '2026-09-30T23:03:32.447278+00:00'
+wall_seconds: 389.29
+tokens_processed: 6144000
+gpu_hours: 0.0
+estimated_cost_usd: 0.0
+peak_memory_mb: 779.9
+checkpoint_path: artifacts/runs/mqar_gdn_a2of4_block_end_d64_L32_lr1e-3_s0_0d2138c4/ckpt.pt
+metrics_path: artifacts/runs/mqar_gdn_a2of4_block_end_d64_L32_lr1e-3_s0_0d2138c4/metrics.jsonl
+final_train_loss_ema: 0.03456485393662903

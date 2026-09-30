@@ -1,0 +1,330 @@
+[
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=2, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "preferred_model": "constant",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 1.0
+    },
+    "aicc": -80.18890021378998
+   },
+   "linear": {
+    "params": {
+     "slope": 2.0553579095097192e-16,
+     "intercept": 0.9999999999999998
+    },
+    "aicc": -70.18890021378998
+   },
+   "logistic": {
+    "params": {
+     "floor": 1.0,
+     "ceil": 1.0,
+     "rc": 0.0,
+     "width": 0.005
+    },
+    "aicc": -38.18890021378998
+   }
+  },
+  "logistic_win_fraction": 0.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.0
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=2, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "preferred_model": "logistic",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 0.9166666666666666
+    },
+    "aicc": -6.900585489627897
+   },
+   "linear": {
+    "params": {
+     "slope": 0.24804687500000022,
+     "intercept": 0.7926432291666662
+    },
+    "aicc": -1.1311806001117297
+   },
+   "logistic": {
+    "params": {
+     "floor": 0.7519530068419518,
+     "ceil": 0.9999848760209022,
+     "rc": 0.43,
+     "width": 0.014426999059072134
+    },
+    "aicc": -19.788241159996687
+   }
+  },
+  "logistic_win_fraction": 1.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.24609375
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=4, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "preferred_model": "constant",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 1.0
+    },
+    "aicc": -80.18890021378998
+   },
+   "linear": {
+    "params": {
+     "slope": 2.0553579095097192e-16,
+     "intercept": 0.9999999999999998
+    },
+    "aicc": -70.18890021378998
+   },
+   "logistic": {
+    "params": {
+     "floor": 1.0,
+     "ceil": 1.0,
+     "rc": 0.0,
+     "width": 0.005
+    },
+    "aicc": -38.18890021378998
+   }
+  },
+  "logistic_win_fraction": 0.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.0
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=4, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "preferred_model": "logistic",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 0.8173828125
+    },
+    "aicc": -2.2927623181472665
+   },
+   "linear": {
+    "params": {
+     "slope": 0.5375976562500002,
+     "intercept": 0.5485839843749997
+    },
+    "aicc": 3.3716528829635557
+   },
+   "logistic": {
+    "params": {
+     "floor": 0.462401668681738,
+     "ceil": 0.9999650391118416,
+     "rc": 0.46,
+     "width": 0.010133839082682112
+    },
+    "aicc": -14.725606235081095
+   }
+  },
+  "logistic_win_fraction": 1.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.52734375
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=6, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "preferred_model": "constant",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 0.9996744791666666
+    },
+    "aicc": -43.39689988993021
+   },
+   "linear": {
+    "params": {
+     "slope": 0.00032552083333339127,
+     "intercept": 0.9995117187499998
+    },
+    "aicc": -34.25994610728589
+   },
+   "logistic": {
+    "params": {
+     "floor": 0.9988606770833333,
+     "ceil": 0.9998372395833334,
+     "rc": 0.0,
+     "width": 0.005
+    },
+    "aicc": -5.555782973288856
+   }
+  },
+  "logistic_win_fraction": 0.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.0006510416666666297
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=6, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "preferred_model": "logistic",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 0.7707248263888888
+    },
+    "aicc": -0.9383098124629621
+   },
+   "linear": {
+    "params": {
+     "slope": 0.6738281250000001,
+     "intercept": 0.4338107638888888
+    },
+    "aicc": 4.723719667017358
+   },
+   "logistic": {
+    "params": {
+     "floor": 0.32584388157450567,
+     "ceil": 0.9995464269045929,
+     "rc": 0.46,
+     "width": 0.010133839082682112
+    },
+    "aicc": -6.936355099534268
+   }
+  },
+  "logistic_win_fraction": 1.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.6608072916666667
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=8, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "preferred_model": "constant",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 0.9982096354166666
+    },
+    "aicc": -31.180219619024427
+   },
+   "linear": {
+    "params": {
+     "slope": 0.003906250000000312,
+     "intercept": 0.9962565104166663
+    },
+    "aicc": -24.031457553854665
+   },
+   "logistic": {
+    "params": {
+     "floor": 0.9910888671875,
+     "ceil": 0.9996337890625,
+     "rc": 0.0,
+     "width": 0.005
+    },
+    "aicc": -0.6902016759915668
+   }
+  },
+  "logistic_win_fraction": 0.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.004638671875
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ },
+ {
+  "task": "mqar",
+  "condition": "L=32, num_pairs=8, key_vocab=64, value_vocab=64",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "preferred_model": "constant",
+  "fits": {
+   "constant": {
+    "params": {
+     "c": 0.745361328125
+    },
+    "aicc": -0.465203959260986
+   },
+   "linear": {
+    "params": {
+     "slope": 0.7351074218750002,
+     "intercept": 0.3778076171874999
+    },
+    "aicc": 5.0315171216665036
+   },
+   "logistic": {
+    "params": {
+     "floor": 0.20995326671183184,
+     "ceil": 0.9997875371357552,
+     "rc": 0.22,
+     "width": 0.08436960231581449
+    },
+    "aicc": 0.5798529960534466
+   }
+  },
+  "logistic_win_fraction": 0.0,
+  "threshold_detected": null,
+  "largest_jump": {
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": 0.70849609375
+  },
+  "n_points": 3,
+  "n_seeds_min": 1
+ }
+]

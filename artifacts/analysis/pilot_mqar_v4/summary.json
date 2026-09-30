@@ -1,0 +1,10 @@
+{
+ "tag": "pilot_mqar_v4",
+ "runs": 10,
+ "selected_runs": 5,
+ "figures": [
+  "figures/pilot_mqar_v4_mqar_token_accuracy.png",
+  "figures/pilot_mqar_v4_mqar_exact_match.png"
+ ],
+ "analysis_dir": "/home/user/How-Much-Attention-Do-You-Actually-Need/artifacts/analysis/pilot_mqar_v4"
+}

@@ -1,0 +1,77 @@
+[
+ {
+  "cell": [
+   "mqar",
+   "gdn",
+   0,
+   4,
+   "block_end",
+   64
+  ],
+  "val_token_accuracy_by_lr": {
+   "0.001": 0.9579671223958334,
+   "0.003": 0.9990234375
+  },
+  "selected_lr": 0.003
+ },
+ {
+  "cell": [
+   "mqar",
+   "gdn",
+   2,
+   4,
+   "block_end",
+   64
+  ],
+  "val_token_accuracy_by_lr": {
+   "0.001": 0.9866943359375,
+   "0.003": 1.0
+  },
+  "selected_lr": 0.003
+ },
+ {
+  "cell": [
+   "mqar",
+   "mamba2",
+   0,
+   4,
+   "block_end",
+   64
+  ],
+  "val_token_accuracy_by_lr": {
+   "0.001": 0.29313151041666663,
+   "0.003": 0.4578857421875
+  },
+  "selected_lr": 0.003
+ },
+ {
+  "cell": [
+   "mqar",
+   "mamba2",
+   2,
+   4,
+   "block_end",
+   64
+  ],
+  "val_token_accuracy_by_lr": {
+   "0.001": 0.2933349609375,
+   "0.003": 0.9840901692708334
+  },
+  "selected_lr": 0.003
+ },
+ {
+  "cell": [
+   "mqar",
+   "mamba2",
+   4,
+   4,
+   "block_end",
+   64
+  ],
+  "val_token_accuracy_by_lr": {
+   "0.001": 0.9973551432291666,
+   "0.003": 1.0
+  },
+  "selected_lr": 0.003
+ }
+]

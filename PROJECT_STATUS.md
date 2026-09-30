@@ -4,7 +4,7 @@ Updated: 2026-09-30
 
 ## Current phase
 
-Phase 3 (infrastructure) complete on CPU; Phase 4 (pilot) running.
+Phase 4 (pilot). First interpretable pilot (v4, MQAR) complete; LR-grid extension running.
 
 ## Current hypothesis
 
@@ -18,7 +18,7 @@ See `docs/EXPERIMENT_DESIGN.md` §2. Revised from the brief: state tracking is e
 
 ## In progress
 
-- Stage 4 pilot: `configs/sweeps/pilot_mqar.yaml` (10 CPU runs).
+- Pilot v4 learning-rate extension (1e-2), because 3e-3 (grid top) won every cell.
 
 ## Blocked
 
@@ -27,15 +27,16 @@ See `docs/EXPERIMENT_DESIGN.md` §2. Revised from the brief: state tracking is e
 
 ## Next three actions
 
-1. Read the pilot; decide whether MQAR difficulty and training length are informative at d = 64, L = 128.
-2. Pilot state tracking (parity, S3) with the gdn_neg arm and copy.
-3. Recalibrate the GPU compute estimate on real hardware and ask for budget approval.
+1. Finish the LR extension; re-run the analysis with three LRs.
+2. Seeds 1 and 2 for pilot v4, then a harder MQAR regime (P up to 16, L = 64, 4 layers) where Gated DeltaNet may need attention.
+3. State-tracking and copy pilots at 4 layers; GPU cost recalibration and budget request.
 
 ## Measured results
 
 - CPU training throughput (MEASURED, `artifacts/throughput_cpu_container.csv`).
 - Parameter matching across families and ratios within 3% (MEASURED, tested).
-- No capability result yet.
+- PILOT, one seed (log entry 06): at L = 32, P ≤ 8, d = 64, 4 layers, pure Gated DeltaNet matches pure attention on MQAR (≥ 0.995 test token accuracy), while pure Mamba-2 falls from 0.75 (P = 2) to 0.26 (P = 8); two attention layers of four bring Mamba-2 to ≥ 0.97. Not yet replicated across seeds; LR grid edge unresolved.
+- Trainability finding (log entries 01 to 05): at d = 64, 8-layer pure attention does not leave the MQAR plateau within ~2,000 steps on mixed pair counts, while 4 layers does; learning rate 1e-3 vs 3e-3 decides whether a Mamba-2 hybrid learns MQAR at all.
 
 ## Unverified assumptions
 
@@ -45,8 +46,8 @@ See `docs/EXPERIMENT_DESIGN.md` §2. Revised from the brief: state tracking is e
 
 ## Compute spent
 
-CPU only, in this container; $0 billed. Totals: `make compute-summary`.
+CPU only, in this container; $0 billed. Registered runs so far: 10 (1.15 wall-hours, 61.4M tokens; `artifacts/compute_summary.total.json`). Abandoned pilots and unregistered diagnosis runs add roughly 2 CPU-hours, not itemised.
 
 ## Major decisions
 
-See `docs/DECISIONS.md` (S1 to S7).
+See `docs/DECISIONS.md` (S1 to S8).
