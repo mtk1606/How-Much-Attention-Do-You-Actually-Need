@@ -11,3 +11,6 @@ website/.next/
 website/out/
 artifacts/smoke/
 artifacts/logs/
+# Run outputs are committed with `git add -f` once a sweep completes (in-progress runs change every eval).
+artifacts/runs/
+artifacts/registry.jsonl
