@@ -18,7 +18,16 @@ from attnratio.data.batches import eval_seeds, make_batch, train_seeds
 from attnratio.data.tasks import IGNORE, get_task
 from attnratio.models import HybridLM, ModelConfig
 
-BASE = {"n_layers": 2, "heads": 2, "L": 32, "vocab": 32, "pairs": [4], "lr": 1e-3, "rope": 1.0}
+BASE = {
+    "n_layers": 2,
+    "heads": 2,
+    "L": 32,
+    "vocab": 32,
+    "pairs": [4],
+    "lr": 1e-3,
+    "rope": 1.0,
+    "recipe": "adamw_default",
+}
 VARIANTS = {
     "base": {},
     "depth8": {"n_layers": 8},
@@ -28,6 +37,8 @@ VARIANTS = {
     "vocab64": {"vocab": 64},
     "pairmix": {"pairs": [2, 4, 8]},  # 16 pairs do not fit in L = 32
     "heads4_rope025": {"heads": 4, "rope": 0.25},
+    "v3_task": {"n_layers": 8, "vocab": 64, "pairs": [2, 4, 6, 8]},
+    "v3_task_recipe": {"n_layers": 8, "vocab": 64, "pairs": [2, 4, 6, 8], "recipe": "pilot"},
     "pilot_like": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
     "pilot_like_rope025": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16], "rope": 0.25},
 }
@@ -49,7 +60,24 @@ def run(name: str, steps: int) -> list[dict]:
         rope_fraction=v["rope"],
     )
     model = HybridLM(cfg)
-    opt = torch.optim.AdamW(model.parameters(), lr=v["lr"])
+    if (
+        v["recipe"] == "pilot"
+    ):  # the training loop's optimiser: wd 0.1 on matrices, betas (0.9, 0.98), warmup+cosine, clip 1
+        from attnratio.training.config import DataSpec, RunConfig
+        from attnratio.training.train import build_optimizer, lr_at
+
+        rc = RunConfig(
+            task="mqar",
+            model=cfg,
+            train=(DataSpec(v["L"], {"num_pairs": 2, "key_vocab": v["vocab"], "value_vocab": v["vocab"]}),),
+            eval=(DataSpec(v["L"], {"num_pairs": 2, "key_vocab": v["vocab"], "value_vocab": v["vocab"]}),),
+            steps=3000,
+            lr=v["lr"],
+        )
+        opt = build_optimizer(model, rc)
+    else:
+        rc = None
+        opt = torch.optim.AdamW(model.parameters(), lr=v["lr"])
     out, t0 = [], time.time()
     for s in range(steps + 1):
         if s % 250 == 0:
@@ -65,6 +93,10 @@ def run(name: str, steps: int) -> list[dict]:
         loss = F.cross_entropy(model(b.tokens).flatten(0, 1), b.targets.flatten(), ignore_index=IGNORE)
         opt.zero_grad()
         loss.backward()
+        if rc is not None:
+            for g in opt.param_groups:
+                g["lr"] = lr_at(s, rc)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), rc.grad_clip)
         opt.step()
     return out
 
