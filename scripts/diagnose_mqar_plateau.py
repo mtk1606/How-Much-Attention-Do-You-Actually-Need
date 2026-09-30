@@ -26,7 +26,7 @@ VARIANTS = {
     "v2_task": {"L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
     "len64": {"L": 64},
     "vocab64": {"vocab": 64},
-    "pairmix": {"pairs": [2, 4, 8, 16]},
+    "pairmix": {"pairs": [2, 4, 8]},  # 16 pairs do not fit in L = 32
     "heads4_rope025": {"heads": 4, "rope": 0.25},
     "pilot_like": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
     "pilot_like_rope025": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16], "rope": 0.25},
