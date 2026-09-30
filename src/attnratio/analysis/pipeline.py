@@ -82,7 +82,7 @@ def aggregate(selected: list[dict[str, Any]], n_boot: int = 2000) -> list[dict[s
     rows = []
     for (task, family, n_attn, n_layers, placement, d_model, cond), items in groups.items():
         c = json.loads(cond)
-        chance = get_task(task).chance(c["difficulty"])
+        token_chance = get_task(task).chance(c["difficulty"])
         for metric, per_ex in (("token_accuracy", "per_example_token_accuracy"), ("exact_match", "per_example_exact")):
             per_seed = []
             for _, t in items:
@@ -91,6 +91,7 @@ def aggregate(selected: list[dict[str, Any]], n_boot: int = 2000) -> list[dict[s
                 else:  # runs from before per-example token accuracy was stored: aggregate value only
                     per_seed.append(np.asarray([t[metric]], float))
             mean, lo, hi = hierarchical_bootstrap(per_seed, n_boot=n_boot)
+            chance = token_chance if metric == "token_accuracy" else 0.0  # exact match: effectively 0
             rows.append(
                 {
                     "task": task,
@@ -166,7 +167,8 @@ def plot_curves(rows: list[dict[str, Any]], tag: str, out_dir: Path, metric: str
         n = len(keys)
         cols = min(n, 5)
         nrows = int(np.ceil(n / cols))
-        fig, axes = plt.subplots(nrows, cols, figsize=(2.6 * cols + 0.4, 2.5 * nrows + 0.6), squeeze=False, sharey=True)
+        width = max(5.2, 2.6 * cols + 0.4)
+        fig, axes = plt.subplots(nrows, cols, figsize=(width, 2.5 * nrows + 1.1), squeeze=False, sharey=True)
         for ax, key in zip(axes.flat, keys, strict=False):
             for fam, pts in sorted(curves[key].items()):
                 x = [p["attention_ratio"] for p in pts]
@@ -177,7 +179,7 @@ def plot_curves(rows: list[dict[str, Any]], tag: str, out_dir: Path, metric: str
                 ax.fill_between(x, lo, hi, color=col, alpha=0.15, linewidth=0)
                 ax.plot(x, y, "-o", color=col, lw=2, ms=4.5, label=FAMILY_LABELS.get(fam, fam))
             ax.axhline(pts[0]["chance"], color="#9b9a95", lw=1, ls=":")
-            ax.set_title(key[1], fontsize=9, color="#0b0b0b")
+            ax.set_title(", ".join(key[1].split(", ")[:2]), fontsize=9, color="#0b0b0b")
             ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
             ax.set_ylim(-0.02, 1.02)
             ax.grid(True, color="#e6e5e0", lw=0.6)
@@ -190,8 +192,15 @@ def plot_curves(rows: list[dict[str, Any]], tag: str, out_dir: Path, metric: str
         for ax in axes[-1, :]:
             ax.set_xlabel("attention ratio r", fontsize=9)
         handles, labels = axes.flat[0].get_legend_handles_labels()
-        fig.legend(handles, labels, loc="upper center", ncol=len(labels), frameon=False, fontsize=9)
-        fig.tight_layout(rect=(0, 0, 1, 0.9))
+        fig.legend(handles, labels, loc="upper center", ncol=min(len(labels), 2), frameon=False, fontsize=9)
+        shared = sorted(set.intersection(*(set(k[1].split(", ")[2:]) for k in keys))) if keys else []
+        note = f"{task}, d={keys[0][2]}, {keys[0][3]} layers" + (f"; {', '.join(shared)}" if shared else "")
+        note += "; band = 95% bootstrap interval; dotted = chance"
+        import textwrap
+
+        note = "\n".join(textwrap.wrap(note, width=int(width * 17)))
+        fig.text(0.01, 0.005, note, fontsize=7, color="#52514e", ha="left", va="bottom")
+        fig.tight_layout(rect=(0, 0.07, 1, 0.88))
         stem = out_dir / f"{tag}_{task}_{metric}"
         for ext in ("pdf", "png"):
             fig.savefig(f"{stem}.{ext}", dpi=160)

@@ -22,6 +22,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--threads", type=int)
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--filter", help="substring an experiment_id must contain")
+    p.add_argument("--attention-first", action="store_true", help="run high-attention configs first")
 
     p = sub.add_parser("match-report", help="write configs/model_match_report.csv for sweep files")
     p.add_argument("sweeps", nargs="+")
@@ -59,6 +60,8 @@ def main(argv: list[str] | None = None) -> None:
         configs = load_sweep(args.sweep)
         if args.filter:
             configs = [c for c in configs if args.filter in c.experiment_id]
+        if args.attention_first:
+            configs.sort(key=lambda c: -c.model.attention_ratio)
         tokens = sum(c.steps * c.batch_size * max(s.seq_len for s in c.train) for c in configs)
         print(f"{len(configs)} runs, {tokens / 1e6:.1f}M training tokens")
         if args.dry_run:

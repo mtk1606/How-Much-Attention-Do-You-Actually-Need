@@ -8,12 +8,10 @@ beat linear and constant fits by AICc on seed-level points, consistently across 
 from __future__ import annotations
 
 import math
-import warnings
 from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-from scipy.optimize import curve_fit
 
 
 def hierarchical_bootstrap(
@@ -61,30 +59,26 @@ def fit_models(r: np.ndarray, y: np.ndarray) -> dict[str, FitResult]:
     slope, intercept = np.polyfit(r, y, 1)
     rss = float(((y - (slope * r + intercept)) ** 2).sum())
     out["linear"] = FitResult("linear", {"slope": float(slope), "intercept": float(intercept)}, _aicc(rss, n, 2))
-    best = None
+    # Profile fit: for fixed (rc, width) the logistic is linear in (floor, ceil), so those are solved in
+    # closed form (clipped to [0, 1]) over a dense grid of rc and log-spaced widths. Deterministic.
     lo_r, hi_r = float(r.min()), float(r.max())
-    for rc0 in np.linspace(lo_r, hi_r, 7):
-        for w0 in (0.02, 0.08, 0.25):
-            try:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    p, _ = curve_fit(
-                        logistic,
-                        r,
-                        y,
-                        p0=[max(0.0, y.min()), min(1.0, y.max()), rc0, w0],
-                        bounds=([0.0, 0.0, lo_r, 1e-3], [1.0, 1.0, hi_r, 1.0]),
-                        maxfev=5000,
-                    )
-            except (RuntimeError, ValueError):
-                continue
-            rss = float(((y - logistic(r, *p)) ** 2).sum())
-            if best is None or rss < best[1]:
-                best = (p, rss)
-    if best is not None:
-        p, rss = best
-        params = dict(zip(("floor", "ceil", "rc", "width"), map(float, p), strict=True))
-        out["logistic"] = FitResult("logistic", params, _aicc(rss, n, 4))
+    rcs = np.linspace(lo_r, hi_r, 101)
+    widths = np.geomspace(0.005, 1.0, 16)
+    z = (r[None, None, :] - rcs[:, None, None]) / widths[None, :, None]
+    sig = 1.0 / (1.0 + np.exp(np.clip(-z, -60, 60)))  # (rc, w, n)
+    a = 1.0 - sig  # design: y = floor * a + ceil * sig
+    saa, sss, sas = (a * a).sum(-1), (sig * sig).sum(-1), (a * sig).sum(-1)
+    say, ssy = (a * y).sum(-1), (sig * y).sum(-1)
+    det = saa * sss - sas**2
+    with np.errstate(divide="ignore", invalid="ignore"):
+        floor = np.where(det > 1e-12, (sss * say - sas * ssy) / det, y.mean())
+        ceil = np.where(det > 1e-12, (saa * ssy - sas * say) / det, y.mean())
+    floor, ceil = np.clip(floor, 0.0, 1.0), np.clip(ceil, 0.0, 1.0)
+    pred = floor[..., None] * a + ceil[..., None] * sig
+    rss_grid = ((pred - y) ** 2).sum(-1)
+    i, j = np.unravel_index(int(np.argmin(rss_grid)), rss_grid.shape)
+    params = {"floor": float(floor[i, j]), "ceil": float(ceil[i, j]), "rc": float(rcs[i]), "width": float(widths[j])}
+    out["logistic"] = FitResult("logistic", params, _aicc(float(rss_grid[i, j]), n, 4))
     return out
 
 
@@ -121,19 +115,21 @@ def threshold_analysis(
                 wins += 1
                 rcs.append(fits["logistic"].params["rc"])
     frac = wins / n_boot
+    n_seeds_min = int(min(len(per_seed_scores[x]) for x in ratios))
     preferred = min(full.values(), key=lambda f: f.aicc)
     res: dict[str, Any] = {
         "preferred_model": preferred.model,
         "fits": {k: {"params": v.params, "aicc": v.aicc} for k, v in full.items()},
         "logistic_win_fraction": frac,
-        "threshold_detected": frac >= 0.8,
+        # Seed-level resampling is meaningless with one seed; no threshold claim is made then.
+        "threshold_detected": (frac >= 0.8) if n_seeds_min >= 2 else None,
         "largest_jump": {
             "from_ratio": ratios[j] if len(jumps) else None,
             "to_ratio": ratios[j + 1] if len(jumps) else None,
             "delta": float(jumps[j]) if len(jumps) else 0.0,
         },
         "n_points": int(r.size),
-        "n_seeds_min": int(min(len(per_seed_scores[x]) for x in ratios)),
+        "n_seeds_min": n_seeds_min,
     }
     if res["threshold_detected"]:
         lo, hi = np.quantile(rcs, [0.025, 0.975])
