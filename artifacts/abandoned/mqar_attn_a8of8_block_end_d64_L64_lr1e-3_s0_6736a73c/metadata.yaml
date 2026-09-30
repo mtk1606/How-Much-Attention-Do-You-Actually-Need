@@ -1,0 +1,86 @@
+experiment_id: mqar_attn_a8of8_block_end_d64_L64_lr1e-3_s0_6736a73c
+git_commit: 60e276abc3e4c51dcad1b14cbd23272e5c2663b4
+git_dirty: false
+model_config:
+  family: mamba2
+  vocab_size: 144
+  d_model: 64
+  n_layers: 8
+  n_attn: 8
+  placement: block_end
+  attn_heads: 4
+  mlp_ratio: 2.0
+  mamba_head_dim: 8
+  mamba_d_state: 16
+  gdn_heads: 4
+  d_conv: 4
+  chunk: 32
+  extra: {}
+  attention_ratio: 1.0
+dataset_config:
+  task: mqar
+  train:
+  - seq_len: 64
+    difficulty:
+      num_pairs: 2
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 64
+    difficulty:
+      num_pairs: 4
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 64
+    difficulty:
+      num_pairs: 8
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 64
+    difficulty:
+      num_pairs: 16
+      key_vocab: 64
+      value_vocab: 64
+  eval:
+  - seq_len: 64
+    difficulty:
+      num_pairs: 2
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 64
+    difficulty:
+      num_pairs: 4
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 64
+    difficulty:
+      num_pairs: 8
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 64
+    difficulty:
+      num_pairs: 16
+      key_vocab: 64
+      value_vocab: 64
+attention_ratio: 1.0
+attention_placement: block_end
+architecture: mamba2
+layer_types: AAAAAAAA
+seed: 0
+parameter_count: 337984
+non_embedding_parameters: 328768
+attention_mixer_params_per_layer: 16384
+other_mixer_params_per_layer: 0
+mixer_param_ratio_other_over_attention: 1.0
+recurrent_state_numel_per_layer: 0
+kv_cache_numel_at_seq_len: 65536
+training_tokens: 16384000
+hardware:
+  device: cpu
+  cpu_threads: 2
+  gpu_count: 0
+  host: vm
+precision: fp32
+start_time: '2026-09-30T22:06:57.770520+00:00'
+status: running
+tags:
+- pilot_mqar_v2

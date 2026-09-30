@@ -24,6 +24,9 @@ VARIANTS = {
     "depth8": {"n_layers": 8},
     "heads4": {"heads": 4},
     "v2_task": {"L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
+    "len64": {"L": 64},
+    "vocab64": {"vocab": 64},
+    "pairmix": {"pairs": [2, 4, 8, 16]},
     "heads4_rope025": {"heads": 4, "rope": 0.25},
     "pilot_like": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
     "pilot_like_rope025": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16], "rope": 0.25},
@@ -71,6 +74,6 @@ if __name__ == "__main__":
     ap.add_argument("--steps", type=int, default=1000)
     ap.add_argument("--variants", nargs="+", default=list(VARIANTS))
     args = ap.parse_args()
-    torch.set_num_threads(1)
+    torch.set_num_threads(2)
     for name in args.variants:
         run(name, args.steps)
