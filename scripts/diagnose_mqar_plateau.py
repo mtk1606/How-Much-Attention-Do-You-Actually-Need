@@ -18,12 +18,15 @@ from attnratio.data.batches import eval_seeds, make_batch, train_seeds
 from attnratio.data.tasks import IGNORE, get_task
 from attnratio.models import HybridLM, ModelConfig
 
-BASE = {"n_layers": 2, "heads": 2, "L": 32, "vocab": 32, "pairs": [4], "lr": 1e-3}
+BASE = {"n_layers": 2, "heads": 2, "L": 32, "vocab": 32, "pairs": [4], "lr": 1e-3, "rope": 1.0}
 VARIANTS = {
     "base": {},
     "depth8": {"n_layers": 8},
     "heads4": {"heads": 4},
     "v2_task": {"L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
+    "heads4_rope025": {"heads": 4, "rope": 0.25},
+    "pilot_like": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
+    "pilot_like_rope025": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16], "rope": 0.25},
 }
 
 
@@ -34,7 +37,13 @@ def run(name: str, steps: int) -> list[dict]:
     diffs = [task.difficulty({"num_pairs": p, "key_vocab": v["vocab"], "value_vocab": v["vocab"]}) for p in v["pairs"]]
     d_eval = task.difficulty({"num_pairs": 4, "key_vocab": v["vocab"], "value_vocab": v["vocab"]})
     cfg = ModelConfig(
-        "gdn", 1 + 2 * v["vocab"] + 15, d_model=64, n_layers=v["n_layers"], n_attn=v["n_layers"], attn_heads=v["heads"]
+        "gdn",
+        1 + 2 * v["vocab"] + 15,
+        d_model=64,
+        n_layers=v["n_layers"],
+        n_attn=v["n_layers"],
+        attn_heads=v["heads"],
+        rope_fraction=v["rope"],
     )
     model = HybridLM(cfg)
     opt = torch.optim.AdamW(model.parameters(), lr=v["lr"])

@@ -27,13 +27,23 @@ from .stats import hierarchical_bootstrap, threshold_analysis
 
 # Categorical slots from the validated reference palette (dataviz skill), fixed order by entity.
 FAMILY_COLORS = {"mamba2": "#2a78d6", "gdn": "#eb6834", "gdn_neg": "#1baf7a"}
-FAMILY_LABELS = {"mamba2": "Mamba-2 hybrid", "gdn": "Gated DeltaNet hybrid", "gdn_neg": "Gated DeltaNet (β∈(0,2)) hybrid"}
+FAMILY_LABELS = {
+    "mamba2": "Mamba-2 hybrid",
+    "gdn": "Gated DeltaNet hybrid",
+    "gdn_neg": "Gated DeltaNet (β∈(0,2)) hybrid",
+}
 
 
 def condition_label(task: str, seq_len: int, difficulty: dict[str, Any]) -> str:
     t = get_task(task)
     changed = {k: v for k, v in difficulty.items() if t.defaults.get(k) != v}
-    main = {"mqar": "num_pairs", "copy": "span_length", "niah": "n_needles", "state": "group", "induction": "segment_length"}
+    main = {
+        "mqar": "num_pairs",
+        "copy": "span_length",
+        "niah": "n_needles",
+        "state": "group",
+        "induction": "segment_length",
+    }
     key = main.get(task)
     parts = [f"L={seq_len}"]
     if key:

@@ -66,6 +66,7 @@ class ModelConfig:
     n_attn: int = 0
     placement: str = "block_end"
     attn_heads: int = 4
+    rope_fraction: float = 1.0
     mlp_ratio: float = 2.0
     mamba_head_dim: int = 16
     mamba_d_state: int = 16
@@ -103,7 +104,7 @@ class ModelConfig:
 
 def build_mixer(cfg: ModelConfig, is_attention: bool) -> nn.Module:
     if is_attention:
-        return AttentionMixer(cfg.d_model, cfg.attn_heads)
+        return AttentionMixer(cfg.d_model, cfg.attn_heads, rope_fraction=cfg.rope_fraction)
     if cfg.family == "mamba2":
         return Mamba2Mixer(cfg.d_model, cfg.mamba_d_inner, cfg.mamba_head_dim, cfg.mamba_d_state, cfg.d_conv, cfg.chunk)
     # Gated DeltaNet: H * d_k = d/2 and H * d_v = d gives q,k (d^2) + v, gate, o (3 d^2) = 4 d^2.

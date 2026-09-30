@@ -267,7 +267,14 @@ TASKS: dict[str, Task] = {
         "content-addressable retrieval",
         lambda d: 1 / d["value_vocab"],
     ),
-    "copy": Task("copy", copy_example, _copy_vocab, {"span_length": 32, "vocab": 32, "n_spans": 1}, "exact copying", lambda d: 1 / d["vocab"]),
+    "copy": Task(
+        "copy",
+        copy_example,
+        _copy_vocab,
+        {"span_length": 32, "vocab": 32, "n_spans": 1},
+        "exact copying",
+        lambda d: 1 / d["vocab"],
+    ),
     "niah": Task(
         "niah",
         niah_example,
@@ -283,7 +290,14 @@ TASKS: dict[str, Task] = {
         "needle retrieval",
         lambda d: 1 / d["value_vocab"],
     ),
-    "state": Task("state", state_example, _state_vocab, {"group": "parity", "modulus": 5}, "state tracking", lambda d: 1 / len(_group_table(d))),
+    "state": Task(
+        "state",
+        state_example,
+        _state_vocab,
+        {"group": "parity", "modulus": 5},
+        "state tracking",
+        lambda d: 1 / len(_group_table(d)),
+    ),
     "induction": Task(
         "induction",
         induction_example,

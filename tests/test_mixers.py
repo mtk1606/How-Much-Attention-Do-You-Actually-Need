@@ -129,3 +129,14 @@ def test_mixer_gradients_are_finite_and_nonzero():
         for name, p in mixer.named_parameters():
             assert p.grad is not None and torch.isfinite(p.grad).all(), name
             assert p.grad.abs().sum() > 0, name
+
+
+def test_partial_rope_is_causal_and_zero_rope_is_translation_invariant():
+    torch.manual_seed(0)
+    d = 32
+    _causality(AttentionMixer(d, 2, rope_fraction=0.25), d)
+    m = AttentionMixer(d, 2, rope_fraction=0.0)
+    assert m.rope_dim == 0
+    x = torch.randn(1, 1, d).expand(1, 12, d).clone()  # identical tokens: without RoPE every output is equal
+    y = m(x)
+    torch.testing.assert_close(y[:, 0], y[:, -1])
