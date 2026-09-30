@@ -113,19 +113,19 @@
   },
   "condition": "L=32, num_pairs=2, key_vocab=64, value_vocab=64",
   "metric": "exact_match",
-  "mean": 0.55859375,
-  "ci_low": 0.513671875,
-  "ci_high": 0.6015625,
+  "mean": 0.99609375,
+  "ci_low": 0.990234375,
+  "ci_high": 1.0,
   "chance": 0.0,
-  "normalized": 0.55859375,
+  "normalized": 0.99609375,
   "n_seeds": 1,
   "seed_values": [
-   0.55859375
+   0.99609375
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -273,19 +273,19 @@
   },
   "condition": "L=32, num_pairs=2, key_vocab=64, value_vocab=64",
   "metric": "token_accuracy",
-  "mean": 0.751953125,
-  "ci_low": 0.7255859375,
-  "ci_high": 0.77734375,
+  "mean": 0.998046875,
+  "ci_low": 0.9951171875,
+  "ci_high": 1.0,
   "chance": 0.015625,
-  "normalized": 0.748015873015873,
+  "normalized": 0.998015873015873,
   "n_seeds": 1,
   "seed_values": [
-   0.751953125
+   0.998046875
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -433,19 +433,19 @@
   },
   "condition": "L=32, num_pairs=4, key_vocab=64, value_vocab=64",
   "metric": "exact_match",
-  "mean": 0.00390625,
-  "ci_low": 0.0,
-  "ci_high": 0.009765625,
+  "mean": 0.853515625,
+  "ci_low": 0.822265625,
+  "ci_high": 0.884765625,
   "chance": 0.0,
-  "normalized": 0.00390625,
+  "normalized": 0.853515625,
   "n_seeds": 1,
   "seed_values": [
-   0.00390625
+   0.853515625
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -593,19 +593,19 @@
   },
   "condition": "L=32, num_pairs=4, key_vocab=64, value_vocab=64",
   "metric": "token_accuracy",
-  "mean": 0.46240234375,
-  "ci_low": 0.44873046875,
-  "ci_high": 0.47705078125,
+  "mean": 0.96044921875,
+  "ci_low": 0.95166015625,
+  "ci_high": 0.96875,
   "chance": 0.015625,
-  "normalized": 0.4538690476190476,
+  "normalized": 0.9598214285714286,
   "n_seeds": 1,
   "seed_values": [
-   0.46240234375
+   0.96044921875
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -753,19 +753,19 @@
   },
   "condition": "L=32, num_pairs=6, key_vocab=64, value_vocab=64",
   "metric": "exact_match",
-  "mean": 0.0,
-  "ci_low": 0.0,
-  "ci_high": 0.0,
+  "mean": 0.63671875,
+  "ci_low": 0.59765625,
+  "ci_high": 0.6796875,
   "chance": 0.0,
-  "normalized": 0.0,
+  "normalized": 0.63671875,
   "n_seeds": 1,
   "seed_values": [
-   0.0
+   0.63671875
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -913,19 +913,19 @@
   },
   "condition": "L=32, num_pairs=6, key_vocab=64, value_vocab=64",
   "metric": "token_accuracy",
-  "mean": 0.3258462265625,
-  "ci_low": 0.31509592626953126,
-  "ci_high": 0.3365884004882812,
+  "mean": 0.927734296875,
+  "ci_low": 0.9189452225585938,
+  "ci_high": 0.9368570341796875,
   "chance": 0.015625,
-  "normalized": 0.31514537301587303,
+  "normalized": 0.9265872222222222,
   "n_seeds": 1,
   "seed_values": [
-   0.3258463541666667
+   0.927734375
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -1073,19 +1073,19 @@
   },
   "condition": "L=32, num_pairs=8, key_vocab=64, value_vocab=64",
   "metric": "exact_match",
-  "mean": 0.0,
-  "ci_low": 0.0,
-  "ci_high": 0.0,
+  "mean": 0.361328125,
+  "ci_low": 0.3203125,
+  "ci_high": 0.40239257812499973,
   "chance": 0.0,
-  "normalized": 0.0,
+  "normalized": 0.361328125,
   "n_seeds": 1,
   "seed_values": [
-   0.0
+   0.361328125
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",
@@ -1233,19 +1233,19 @@
   },
   "condition": "L=32, num_pairs=8, key_vocab=64, value_vocab=64",
   "metric": "token_accuracy",
-  "mean": 0.26416015625,
-  "ci_low": 0.255609130859375,
-  "ci_high": 0.27319946289062497,
+  "mean": 0.88330078125,
+  "ci_low": 0.8740234375,
+  "ci_high": 0.8928283691406249,
   "chance": 0.015625,
-  "normalized": 0.2524801587301587,
+  "normalized": 0.8814484126984127,
   "n_seeds": 1,
   "seed_values": [
-   0.26416015625
+   0.88330078125
   ],
   "experiment_ids": [
-   "mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310"
+   "mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6"
   ],
-  "lr": 0.003
+  "lr": 0.01
  },
  {
   "task": "mqar",

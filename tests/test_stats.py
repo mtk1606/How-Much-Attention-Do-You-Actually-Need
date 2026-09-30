@@ -52,3 +52,25 @@ def test_bootstrap_between_seed_variance_dominates():
     per_seed = [np.full(5000, 0.2), np.full(5000, 0.9), np.full(5000, 0.5)]
     _, lo, hi = hierarchical_bootstrap(per_seed, n_boot=500)
     assert hi - lo > 0.3
+
+
+def test_lr_selection_flags_grid_edge():
+    from attnratio.analysis.pipeline import select_lr
+
+    def run(lr, acc):
+        return {
+            "task": "mqar",
+            "family": "gdn",
+            "n_attn": 0,
+            "n_layers": 4,
+            "placement": "block_end",
+            "d_model": 64,
+            "lr": lr,
+            "experiment_id": f"x{lr}",
+            "final": {"val": [{"token_accuracy": acc}]},
+        }
+
+    _, log = select_lr([run(1e-3, 0.5), run(3e-3, 0.9), run(1e-2, 0.7)])
+    assert log[0]["selected_lr"] == 3e-3 and not log[0]["lr_at_grid_edge"]
+    _, log = select_lr([run(1e-3, 0.5), run(3e-3, 0.9), run(1e-2, 0.95)])
+    assert log[0]["selected_lr"] == 1e-2 and log[0]["lr_at_grid_edge"]

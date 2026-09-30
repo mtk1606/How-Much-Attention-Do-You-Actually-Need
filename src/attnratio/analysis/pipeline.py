@@ -79,7 +79,11 @@ def select_lr(runs: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[di
         }
         best = max(scores, key=lambda lr: scores[lr])
         selected.extend(by_lr[best])
-        log.append({"cell": list(cell), "val_token_accuracy_by_lr": scores, "selected_lr": best})
+        # A winner at the edge of the grid means a better LR may lie outside it (log entry 06).
+        at_edge = len(scores) < 2 or best in (min(scores), max(scores))
+        log.append(
+            {"cell": list(cell), "val_token_accuracy_by_lr": scores, "selected_lr": best, "lr_at_grid_edge": at_edge}
+        )
     return selected, log
 
 
@@ -251,6 +255,7 @@ def analyze_tag(tag: str, out_dir: Path) -> dict[str, Any]:
         "tag": tag,
         "runs": len(runs),
         "selected_runs": len(selected),
+        "cells_with_lr_at_grid_edge": [c["cell"] for c in lr_log if c["lr_at_grid_edge"]],
         "figures": [str(p) for p in figs],
         "analysis_dir": str(adir),
     }

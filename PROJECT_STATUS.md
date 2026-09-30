@@ -18,7 +18,7 @@ See `docs/EXPERIMENT_DESIGN.md` §2. Revised from the brief: state tracking is e
 
 ## In progress
 
-- Pilot v4 learning-rate extension (1e-2), because 3e-3 (grid top) won every cell.
+- Pure Mamba-2 at LR 2e-2 and 3e-2 (1e-2 was again the grid top).
 
 ## Blocked
 
@@ -35,7 +35,8 @@ See `docs/EXPERIMENT_DESIGN.md` §2. Revised from the brief: state tracking is e
 
 - CPU training throughput (MEASURED, `artifacts/throughput_cpu_container.csv`).
 - Parameter matching across families and ratios within 3% (MEASURED, tested).
-- PILOT, one seed (log entry 06): at L = 32, P ≤ 8, d = 64, 4 layers, pure Gated DeltaNet matches pure attention on MQAR (≥ 0.995 test token accuracy), while pure Mamba-2 falls from 0.75 (P = 2) to 0.26 (P = 8); two attention layers of four bring Mamba-2 to ≥ 0.97. Not yet replicated across seeds; LR grid edge unresolved.
+- PILOT, one seed (log entry 06, corrected): at L = 32, P ≤ 8, d = 64, 4 layers, pure Gated DeltaNet matches pure attention on MQAR (≥ 0.995 test token accuracy); pure Mamba-2 degrades mildly with P (0.998 → 0.883) once its LR is raised to 1e-2. The earlier "Mamba-2 fails" reading (0.26 at P = 8) was an LR-grid artifact. Higher LRs for pure Mamba-2 are running.
+- Methodological finding: good LRs differ by architecture by ~3x in both directions (attention collapses at 1e-2; pure Mamba-2 needs it), so a shared LR grid manufactures architecture effects.
 - Trainability finding (log entries 01 to 05): at d = 64, 8-layer pure attention does not leave the MQAR plateau within ~2,000 steps on mixed pair counts, while 4 layers does; learning rate 1e-3 vs 3e-3 decides whether a Mamba-2 hybrid learns MQAR at all.
 
 ## Unverified assumptions

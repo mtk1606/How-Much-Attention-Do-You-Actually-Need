@@ -1,0 +1,96 @@
+experiment_id: mqar_mamba2_a2of4_block_end_d64_L32_lr1e-2_s0_2614f2a6
+git_commit: a8b95fea030f89a6df516f3a00c7c9b150e0388c
+git_dirty: false
+model_config:
+  family: mamba2
+  vocab_size: 144
+  d_model: 64
+  n_layers: 4
+  n_attn: 2
+  placement: block_end
+  attn_heads: 2
+  rope_fraction: 1.0
+  mlp_ratio: 2.0
+  mamba_head_dim: 8
+  mamba_d_state: 16
+  gdn_heads: 4
+  d_conv: 4
+  chunk: 32
+  extra: {}
+  attention_ratio: 0.5
+dataset_config:
+  task: mqar
+  train:
+  - seq_len: 32
+    difficulty:
+      num_pairs: 2
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 4
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 6
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 8
+      key_vocab: 64
+      value_vocab: 64
+  eval:
+  - seq_len: 32
+    difficulty:
+      num_pairs: 2
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 4
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 6
+      key_vocab: 64
+      value_vocab: 64
+  - seq_len: 32
+    difficulty:
+      num_pairs: 8
+      key_vocab: 64
+      value_vocab: 64
+attention_ratio: 0.5
+attention_placement: block_end
+architecture: mamba2
+layer_types: SASA
+seed: 0
+parameter_count: 174998
+non_embedding_parameters: 165782
+attention_mixer_params_per_layer: 16384
+other_mixer_params_per_layer: 17067
+mixer_param_ratio_other_over_attention: 1.04168701171875
+recurrent_state_numel_per_layer: 1152
+kv_cache_numel_at_seq_len: 8192
+training_tokens: 6144000
+hardware:
+  device: cpu
+  cpu_threads: 2
+  gpu_count: 0
+  host: vm
+precision: fp32
+start_time: '2026-09-30T23:22:36.355938+00:00'
+status: completed
+tags:
+- pilot_mqar_v4
+end_time: '2026-09-30T23:29:38.498422+00:00'
+wall_seconds: 419.91
+tokens_processed: 6144000
+gpu_hours: 0.0
+estimated_cost_usd: 0.0
+peak_memory_mb: 775.1
+checkpoint_path: artifacts/runs/mqar_mamba2_a2of4_block_end_d64_L32_lr1e-2_s0_2614f2a6/ckpt.pt
+metrics_path: artifacts/runs/mqar_mamba2_a2of4_block_end_d64_L32_lr1e-2_s0_2614f2a6/metrics.jsonl
+final_train_loss_ema: 0.13670035869107316

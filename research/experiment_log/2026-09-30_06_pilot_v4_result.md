@@ -1,5 +1,9 @@
 # 2026-09-30 · 06 · Pilot v4 result: MQAR at r ∈ {0, 1/2, 1}, 4 layers (PILOT, one seed)
 
+> **Correction (same day, after the LR extension below):** the pure Mamba-2 failure in the first table was
+> mostly a learning-rate artifact. With LR 1e-2 it reaches 0.883 to 0.998. Interpretation points 1 and 2 are
+> withdrawn; see "LR extension" at the end.
+
 Sweep `configs/sweeps/pilot_mqar_v4.yaml`, tag `pilot_mqar_v4`, 10 runs, all completed. CPU only: 1.15 wall-hours,
 61.4M training tokens, $0 billed (`artifacts/compute_summary.csv`).
 Analysis: `attnratio analyze pilot_mqar_v4` → `artifacts/analysis/pilot_mqar_v4/`, figure
@@ -51,3 +55,34 @@ Learning-rate sensitivity (validation, mean over P): 1e-3 left Mamba-2 r = 1/2 a
 
 Before seeds: finish the LR extension. Then: 3 seeds for the Mamba-2 arm; a harder regime (P up to 16 at L = 64
 with 4 layers, untested for trainability) to find where Gated DeltaNet starts needing attention.
+
+## LR extension (MEASURED, test split, 1 seed)
+
+`configs/sweeps/pilot_mqar_v4_lr.yaml` added LR 1e-2 for all five cells (same tag). Validation token accuracy
+(mean over P) by LR:
+
+| cell | 1e-3 | 3e-3 | 1e-2 | selected |
+|---|---|---|---|---|
+| attention r = 1 | 0.997 | 1.000 | 0.287 | 3e-3 |
+| Mamba-2 r = 1/2 | 0.293 | 0.984 | 0.961 | 3e-3 |
+| Mamba-2 r = 0 | 0.293 | 0.458 | 0.943 | 1e-2 |
+| Gated DeltaNet r = 1/2 | 0.987 | 1.000 | 1.000 | 3e-3 |
+| Gated DeltaNet r = 0 | 0.958 | 0.999 | 0.993 | 3e-3 |
+
+Test token accuracy with the re-selected LR, pure Mamba-2 (r = 0): P = 2 / 4 / 6 / 8 = 0.998 / 0.960 [0.952, 0.969] /
+0.928 [0.919, 0.937] / 0.883 [0.874, 0.893]. Other cells unchanged.
+
+## Revised interpretation
+
+1. The large Mamba-2 deficit reported above was an artifact of an LR grid that stopped too low. Each architecture
+   has a different good LR (attention collapses at 1e-2; pure Mamba-2 needs it). A shared LR grid would have
+   produced a fake architecture effect.
+2. What survives, pending seeds: pure Mamba-2 degrades with P (0.998 → 0.883 at P = 8) while pure Gated DeltaNet
+   stays ≥ 0.995 and r = 1/2 Mamba-2 stays ≥ 0.973. This is a small, P-dependent gap, not a failure.
+3. 1e-2 is again the top of the grid for pure Mamba-2, so 2e-2 and 3e-2 are running
+   (`configs/sweeps/pilot_mqar_v4_lr2.yaml`).
+
+## Decision (revised)
+
+The main sweep needs a per-architecture LR grid wide enough that the selected LR is interior for every cell, and
+the analysis should flag any cell whose selected LR is at a grid edge. Adding that check to the pipeline.

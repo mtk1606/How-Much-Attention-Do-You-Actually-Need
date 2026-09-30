@@ -1,0 +1,26 @@
+# Pilot v4 LR extension 2: pure Mamba-2 selected 1e-2, again the top of the grid (log entry 06, correction).
+# Same tag, so the analysis selects among all five LRs for this cell.
+name: pilot_mqar_v4
+base:
+  task: mqar
+  model: {family: gdn, vocab_size: 144, d_model: 64, n_layers: 4, n_attn: 0, placement: block_end, attn_heads: 2, gdn_heads: 4, mamba_head_dim: 8, mamba_d_state: 16, chunk: 32}
+  train:
+    - {seq_len: 32, difficulty: {num_pairs: 2, key_vocab: 64, value_vocab: 64}}
+    - {seq_len: 32, difficulty: {num_pairs: 4, key_vocab: 64, value_vocab: 64}}
+    - {seq_len: 32, difficulty: {num_pairs: 6, key_vocab: 64, value_vocab: 64}}
+    - {seq_len: 32, difficulty: {num_pairs: 8, key_vocab: 64, value_vocab: 64}}
+  eval:
+    - {seq_len: 32, difficulty: {num_pairs: 2, key_vocab: 64, value_vocab: 64}}
+    - {seq_len: 32, difficulty: {num_pairs: 4, key_vocab: 64, value_vocab: 64}}
+    - {seq_len: 32, difficulty: {num_pairs: 6, key_vocab: 64, value_vocab: 64}}
+    - {seq_len: 32, difficulty: {num_pairs: 8, key_vocab: 64, value_vocab: 64}}
+  steps: 3000
+  batch_size: 64
+  lr: 1.0e-3
+  eval_every: 500
+  n_eval: 512
+  n_val: 256
+grid:
+  model.family: [mamba2]
+  model.n_attn: [0]
+  lr: [2.0e-2, 3.0e-2]

@@ -9,3 +9,8 @@ mqar_mamba2_a0of4_block_end_d64_L32_lr1e-3_s0_0ee3f59a,completed,cpu,0,2,522.63,
 mqar_mamba2_a0of4_block_end_d64_L32_lr3e-3_s0_f158e310,completed,cpu,0,2,524.3,0.0,0.0,6144000,816.3,fp32
 mqar_gdn_a0of4_block_end_d64_L32_lr1e-3_s0_839d49f7,completed,cpu,0,2,535.35,0.0,0.0,6144000,813.3,fp32
 mqar_gdn_a0of4_block_end_d64_L32_lr3e-3_s0_5318fa66,completed,cpu,0,2,534.7,0.0,0.0,6144000,816.3,fp32
+mqar_mamba2_a2of4_block_end_d64_L32_lr1e-2_s0_2614f2a6,completed,cpu,0,2,419.91,0.0,0.0,6144000,775.1,fp32
+mqar_mamba2_a0of4_block_end_d64_L32_lr1e-2_s0_b857aee6,completed,cpu,0,2,532.55,0.0,0.0,6144000,808.6,fp32
+mqar_attn_a4of4_block_end_d64_L32_lr1e-2_s0_c8d06ebd,completed,cpu,0,2,225.97,0.0,0.0,6144000,775.1,fp32
+mqar_gdn_a2of4_block_end_d64_L32_lr1e-2_s0_ad679e82,completed,cpu,0,2,395.39,0.0,0.0,6144000,775.1,fp32
+mqar_gdn_a0of4_block_end_d64_L32_lr1e-2_s0_ddcd301f,completed,cpu,0,2,535.25,0.0,0.0,6144000,808.6,fp32

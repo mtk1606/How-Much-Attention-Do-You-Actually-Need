@@ -1,7 +1,17 @@
 {
  "tag": "pilot_mqar_v4",
- "runs": 10,
+ "runs": 15,
  "selected_runs": 5,
+ "cells_with_lr_at_grid_edge": [
+  [
+   "mqar",
+   "mamba2",
+   0,
+   4,
+   "block_end",
+   64
+  ]
+ ],
  "figures": [
   "figures/pilot_mqar_v4_mqar_token_accuracy.png",
   "figures/pilot_mqar_v4_mqar_exact_match.png"
