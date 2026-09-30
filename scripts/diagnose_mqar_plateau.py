@@ -38,6 +38,8 @@ VARIANTS = {
     "pairmix": {"pairs": [2, 4, 8]},  # 16 pairs do not fit in L = 32
     "heads4_rope025": {"heads": 4, "rope": 0.25},
     "v3_task": {"n_layers": 8, "vocab": 64, "pairs": [2, 4, 6, 8]},
+    "v3_vocab32": {"n_layers": 8, "vocab": 32, "pairs": [2, 4, 6, 8]},
+    "v3_depth4": {"n_layers": 4, "vocab": 64, "pairs": [2, 4, 6, 8]},
     "v3_task_recipe": {"n_layers": 8, "vocab": 64, "pairs": [2, 4, 6, 8], "recipe": "pilot"},
     "pilot_like": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16]},
     "pilot_like_rope025": {"n_layers": 8, "heads": 4, "L": 64, "vocab": 64, "pairs": [2, 4, 8, 16], "rope": 0.25},
