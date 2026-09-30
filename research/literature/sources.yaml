@@ -1,0 +1,163 @@
+# One record per external claim used by the project. See verification.md for the claim table.
+# accessed_date is when I checked it. primary_source=true means the URL is the authors' own artifact.
+# verified=true only when the content itself was read; excerpt-only reads are noted.
+- id: L1
+  claim: Transformer architecture built from attention and MLP only
+  source_title: Attention Is All You Need
+  authors_or_org: Vaswani et al.
+  url: https://arxiv.org/abs/1706.03762
+  publication_date: 2017-06-12
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: true
+  notes: canonical
+- id: L2
+  claim: Nemotron 3 Super is an 88-layer hybrid Mamba-2 / attention LatentMoE model, 120.6B total, 12.7B active
+  source_title: Nemotron 3 Super training guide and architecture notes
+  authors_or_org: NVIDIA (NVIDIA-NeMo/Nemotron repository)
+  url: https://github.com/NVIDIA-NeMo/Nemotron/blob/main/docs/nemotron/super3/README.md
+  publication_date: unknown
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: true
+  notes: read from a shallow clone of the official repo
+- id: L3
+  claim: 40 Mamba-2 layers, 40 LatentMoE layers, 8 GQA attention layers
+  source_title: "Nemotron 3 Super: Open, Efficient Mixture-of-Experts Hybrid Mamba-Transformer Model for Agentic Reasoning"
+  authors_or_org: NVIDIA
+  url: https://arxiv.org/abs/2604.12374
+  publication_date: 2026-04
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: content read through search-index excerpt only; arxiv.org blocked by container egress policy
+- id: L5
+  claim: Nemotron 3 family white paper
+  source_title: "NVIDIA Nemotron 3: Efficient and Open Intelligence"
+  authors_or_org: NVIDIA
+  url: https://arxiv.org/abs/2512.20856
+  publication_date: 2025-12
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: cited by the official repo's architecture notes; PDF not readable here
+- id: L6-L7
+  claim: Qwen3.6 is part of the Qwen3.5 series; hybrid Gated DeltaNet + gated attention with full attention every 4th layer
+  source_title: QwenLM/Qwen3.6 README; transformers 5.18.0 qwen3_5_moe configuration
+  authors_or_org: Qwen team (Alibaba); Hugging Face
+  url: https://github.com/QwenLM/Qwen3.6
+  publication_date: 2026
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: true
+  notes: default full_attention_interval=4 read from the transformers wheel on PyPI; 35B-A3B layout "10 x (3 x GDN -> 1 x Gated Attention)" read from model card excerpt
+- id: L9
+  claim: Mamba-3 (trapezoidal discretization, complex states, MIMO)
+  source_title: "Mamba-3: Improved Sequence Modeling using State Space Principles"
+  authors_or_org: Lahoti, Li, Chen, Wang, Bick, Kolter, Dao, Gu
+  url: https://arxiv.org/abs/2603.15569
+  publication_date: 2026-03-16
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only
+- id: L10
+  claim: Gated DeltaNet
+  source_title: "Gated Delta Networks: Improving Mamba2 with Delta Rule"
+  authors_or_org: Yang, Kautz, Hatamizadeh
+  url: https://arxiv.org/abs/2412.06464
+  publication_date: 2024-12
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: official repo README read (NVlabs/GatedDeltaNet)
+- id: L11
+  claim: Gated DeltaNet-2 update rule and results
+  source_title: "Gated DeltaNet-2: Decoupling Erase and Write in Linear Attention"
+  authors_or_org: Hatamizadeh, Choi, Kautz
+  url: https://github.com/NVlabs/GatedDeltaNet-2
+  publication_date: 2026-05-21
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: true
+  notes: update rule quoted from the official README
+- id: L12
+  claim: Transformer-to-hybrid distillation
+  source_title: "The Mamba in the Llama: Distilling and Accelerating Hybrid Models; Transformers to SSMs (MOHAWK)"
+  authors_or_org: Wang, Paliotta, May, Rush, Dao; Bick, Li, Xing, Kolter, Gu
+  url: https://arxiv.org/abs/2408.15237
+  publication_date: 2024-08
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only; related work
+- id: L13a
+  claim: Ratio sweep of six linear-attention variants; recall improves with more full attention, especially below 3:1
+  source_title: A Systematic Analysis of Hybrid Linear Attention
+  authors_or_org: Wang, Zhu, Abreu, Shan, Kergan, Pan, Chou, Li, Zhang, Huang, Eshraghian
+  url: https://arxiv.org/abs/2507.06457
+  publication_date: 2025-07-08
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only; closest prior work
+- id: L13b
+  claim: Systematic analysis of inter-layer and intra-layer hybrids
+  source_title: "Hybrid Architectures for Language Models: Systematic Analysis and Design Insights"
+  authors_or_org: Bae, Acun, Lin, Habeeb, Kim, Luo, Wang, Wu (FAIR at Meta, KAIST)
+  url: https://arxiv.org/abs/2510.04800
+  publication_date: 2025-10
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: abstract excerpt only; ratio findings not read
+- id: L14
+  claim: Jamba ratio ablation (1:3 vs 1:7 attention:Mamba)
+  source_title: "Jamba: A Hybrid Transformer-Mamba Language Model"
+  authors_or_org: Lieber et al. (AI21)
+  url: https://arxiv.org/abs/2403.19887
+  publication_date: 2024-03
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only
+- id: L15
+  claim: Mamba-2-Hybrid 8B has 4 attention, 24 Mamba-2, 28 MLP layers
+  source_title: An Empirical Study of Mamba-based Language Models
+  authors_or_org: Waleffe et al. (NVIDIA)
+  url: https://arxiv.org/abs/2406.07887
+  publication_date: 2024-06
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only
+- id: L16
+  claim: MQAR and the attention-free recall gap
+  source_title: "Zoology: Measuring and Improving Recall in Efficient Language Models"
+  authors_or_org: Arora et al.
+  url: https://arxiv.org/abs/2312.04927
+  publication_date: 2023-12
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only
+- id: L17
+  claim: Transformers beat GSSMs at copying
+  source_title: "Repeat After Me: Transformers are Better than State Space Models at Copying"
+  authors_or_org: Jelassi, Brandfonbrener, Kakade, Malach
+  url: https://arxiv.org/abs/2402.01032
+  publication_date: 2024-02-01
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only
+- id: L18
+  claim: Linear RNNs need negative eigenvalues for parity
+  source_title: Unlocking State-Tracking in Linear RNNs Through Negative Eigenvalues
+  authors_or_org: Grazzi, Siems, Zela, Franke, Hutter, Pontil
+  url: https://arxiv.org/abs/2411.12537
+  publication_date: 2024-11
+  accessed_date: 2026-09-30
+  primary_source: true
+  verified: false
+  notes: excerpt only; ICLR 2025

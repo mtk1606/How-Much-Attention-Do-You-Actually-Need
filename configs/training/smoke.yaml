@@ -1,0 +1,15 @@
+# Minutes-scale end-to-end check on a laptop CPU. Not a result; used by `make smoke` and CI.
+task: mqar
+model: {family: gdn, vocab_size: 64, d_model: 32, n_layers: 4, n_attn: 1, placement: block_end, attn_heads: 2, gdn_heads: 2, mamba_head_dim: 8, mamba_d_state: 8, chunk: 16}
+train:
+  - {seq_len: 64, difficulty: {num_pairs: 4, key_vocab: 16, value_vocab: 16}}
+eval:
+  - {seq_len: 64, difficulty: {num_pairs: 4, key_vocab: 16, value_vocab: 16}}
+steps: 60
+batch_size: 16
+lr: 3.0e-3
+eval_every: 30
+n_eval: 64
+n_val: 32
+save_checkpoint: true
+tags: [smoke]
