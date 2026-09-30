@@ -24,13 +24,14 @@ def evaluate(
 ) -> dict[str, Any]:
     """Returns token accuracy over scored positions, per-example exact match, and first-error position.
 
-    Also returns the per-example exact-match vector so the analysis can bootstrap over examples.
+    Also returns per-example exact match and token accuracy so the analysis can bootstrap over examples.
     """
     was_training = model.training
     model.eval()
     seeds = eval_seeds(task, difficulty, seq_len, n_examples, split=split)
     correct = total = 0
     exact: list[int] = []
+    tok_acc: list[float] = []
     first_err: list[int] = []
     for i in range(0, n_examples, batch_size):
         b = make_batch(task, difficulty, seq_len, seeds[i : i + batch_size])
@@ -40,6 +41,7 @@ def evaluate(
         total += int(b.score_mask.sum())
         miss = b.score_mask & ~hit
         exact.extend((~miss.any(-1)).int().tolist())
+        tok_acc.extend((hit.sum(-1) / b.score_mask.sum(-1).clamp(min=1)).tolist())
         for row_mask, row_miss in zip(b.score_mask, miss, strict=True):
             scored = torch.nonzero(row_mask).flatten()
             errs = torch.nonzero(row_miss[scored]).flatten()
@@ -56,4 +58,5 @@ def evaluate(
         "exact_match": float(np.mean(exact)),
         "mean_first_error": float(np.mean(first_err)),
         "per_example_exact": exact,
+        "per_example_token_accuracy": [round(x, 6) for x in tok_acc],
     }

@@ -34,7 +34,7 @@ def git_state() -> dict[str, Any]:
         except (subprocess.CalledProcessError, FileNotFoundError):
             return ""
 
-    return {"git_commit": run("rev-parse", "HEAD") or None, "git_dirty": bool(run("status", "--porcelain"))}
+    return {"git_commit": run("rev-parse", "HEAD") or None, "git_dirty": bool(run("status", "--porcelain", "--untracked-files=no"))}
 
 
 def hardware() -> dict[str, Any]:

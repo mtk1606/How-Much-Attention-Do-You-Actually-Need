@@ -38,6 +38,7 @@ class Task:
     vocab_size: Callable[[dict[str, Any]], int]
     defaults: dict[str, Any]
     capability: str
+    chance: Callable[[dict[str, Any]], float]
 
     def difficulty(self, overrides: dict[str, Any] | None = None) -> dict[str, Any]:
         d = dict(self.defaults)
@@ -264,8 +265,9 @@ TASKS: dict[str, Task] = {
         _mqar_vocab,
         {"num_pairs": 16, "key_vocab": 128, "value_vocab": 128, "noise_vocab": 0, "noise_density": 0.0},
         "content-addressable retrieval",
+        lambda d: 1 / d["value_vocab"],
     ),
-    "copy": Task("copy", copy_example, _copy_vocab, {"span_length": 32, "vocab": 32, "n_spans": 1}, "exact copying"),
+    "copy": Task("copy", copy_example, _copy_vocab, {"span_length": 32, "vocab": 32, "n_spans": 1}, "exact copying", lambda d: 1 / d["vocab"]),
     "niah": Task(
         "niah",
         niah_example,
@@ -279,10 +281,16 @@ TASKS: dict[str, Task] = {
             "transform": "identity",
         },
         "needle retrieval",
+        lambda d: 1 / d["value_vocab"],
     ),
-    "state": Task("state", state_example, _state_vocab, {"group": "parity", "modulus": 5}, "state tracking"),
+    "state": Task("state", state_example, _state_vocab, {"group": "parity", "modulus": 5}, "state tracking", lambda d: 1 / len(_group_table(d))),
     "induction": Task(
-        "induction", induction_example, _induction_vocab, {"segment_length": 16, "vocab": 128}, "induction"
+        "induction",
+        induction_example,
+        _induction_vocab,
+        {"segment_length": 16, "vocab": 128},
+        "induction",
+        lambda d: 1 / d["vocab"],
     ),
 }
 
