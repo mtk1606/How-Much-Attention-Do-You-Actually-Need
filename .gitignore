@@ -9,3 +9,5 @@ artifacts/runs/*/ckpt*
 website/node_modules/
 website/.next/
 website/out/
+artifacts/smoke/
+artifacts/logs/
