@@ -1,7 +1,7 @@
 {
- "runs": 15,
- "wall_hours": 1.733,
+ "runs": 17,
+ "wall_hours": 2.028,
  "gpu_hours": 0.0,
  "estimated_cost_usd": 0.0,
- "tokens_processed": 92160000
+ "tokens_processed": 104448000
 }

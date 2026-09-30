@@ -46,37 +46,37 @@
   "d_model": 64,
   "n_layers": 4,
   "family": "mamba2",
-  "preferred_model": "logistic",
+  "preferred_model": "constant",
   "fits": {
    "constant": {
     "params": {
-     "c": 0.9986979166666666
+     "c": 0.9993489583333334
     },
     "aicc": -35.94217994056587
    },
    "linear": {
     "params": {
-     "slope": 0.0019531250000002333,
-     "intercept": 0.9977213541666664
+     "slope": 4.595991113141905e-16,
+     "intercept": 0.9993489583333329
     },
-    "aicc": -30.10106302392554
+    "aicc": -25.94217994056587
    },
    "logistic": {
     "params": {
-     "floor": 0.998046875,
-     "ceil": 1.0,
-     "rc": 0.66,
+     "floor": 1.0,
+     "ceil": 0.9990234375000001,
+     "rc": 0.09,
      "width": 0.005
     },
-    "aicc": -38.18890021378998
+    "aicc": 5.194773842078789
    }
   },
   "logistic_win_fraction": 0.0,
   "threshold_detected": null,
   "largest_jump": {
-   "from_ratio": 0.5,
-   "to_ratio": 1.0,
-   "delta": 0.001953125
+   "from_ratio": 0.0,
+   "to_ratio": 0.5,
+   "delta": -0.001953125
   },
   "n_points": 3,
   "n_seeds_min": 1
@@ -132,33 +132,33 @@
   "fits": {
    "constant": {
     "params": {
-     "c": 0.9833984375
+     "c": 0.9957682291666666
     },
-    "aicc": -18.532993824321792
+    "aicc": -26.593312232286564
    },
    "linear": {
     "params": {
-     "slope": 0.03955078125000005,
-     "intercept": 0.9636230468749998
+     "slope": 0.0024414062500000247,
+     "intercept": 0.9945475260416666
     },
-    "aicc": -16.437459313867002
+    "aicc": -16.75332171477954
    },
    "logistic": {
     "params": {
-     "floor": 0.9601302633066685,
+     "floor": 0.9936523437499999,
      "ceil": 1.0,
-     "rc": 0.41000000000000003,
-     "width": 0.08436960231581449
+     "rc": 0.67,
+     "width": 0.005
     },
-    "aicc": -13.599585583665373
+    "aicc": 13.512540008798126
    }
   },
   "logistic_win_fraction": 0.0,
   "threshold_detected": null,
   "largest_jump": {
-   "from_ratio": 0.0,
-   "to_ratio": 0.5,
-   "delta": 0.029296875
+   "from_ratio": 0.5,
+   "to_ratio": 1.0,
+   "delta": 0.01025390625
   },
   "n_points": 3,
   "n_seeds_min": 1
@@ -210,37 +210,37 @@
   "d_model": 64,
   "n_layers": 4,
   "family": "mamba2",
-  "preferred_model": "logistic",
+  "preferred_model": "constant",
   "fits": {
    "constant": {
     "params": {
-     "c": 0.9713541666666666
+     "c": 0.9939236111111112
     },
-    "aicc": -14.785098302668278
+    "aicc": -25.302441225557494
    },
    "linear": {
     "params": {
-     "slope": 0.07194010416666678,
-     "intercept": 0.9353841145833331
+     "slope": 0.004231770833333124,
+     "intercept": 0.9918077256944445
     },
-    "aicc": -11.159060497024832
+    "aicc": -15.623464122948121
    },
    "logistic": {
     "params": {
-     "floor": 0.922267392959003,
-     "ceil": 0.9999095728647129,
-     "rc": 0.31,
-     "width": 0.12011244339814311
+     "floor": 0.9910481770833334,
+     "ceil": 0.9996744791666666,
+     "rc": 0.74,
+     "width": 0.007118229794928689
     },
-    "aicc": -20.208853552899754
+    "aicc": 14.219238222736358
    }
   },
-  "logistic_win_fraction": 1.0,
+  "logistic_win_fraction": 0.0,
   "threshold_detected": null,
   "largest_jump": {
-   "from_ratio": 0.0,
-   "to_ratio": 0.5,
-   "delta": 0.05891927083333337
+   "from_ratio": 0.5,
+   "to_ratio": 1.0,
+   "delta": 0.01302083333333326
   },
   "n_points": 3,
   "n_seeds_min": 1
@@ -296,33 +296,33 @@
   "fits": {
    "constant": {
     "params": {
-     "c": 0.9517415364583334
+     "c": 0.9853515625
     },
-    "aicc": -12.022665182664802
+    "aicc": -21.114909837788744
    },
    "linear": {
     "params": {
-     "slope": 0.11596679687500015,
-     "intercept": 0.893758138020833
+     "slope": 0.015136718750000208,
+     "intercept": 0.9777832031249999
     },
-    "aicc": -9.283255764633239
+    "aicc": -12.278576230507333
    },
    "logistic": {
     "params": {
-     "floor": 0.8833278748607936,
-     "ceil": 0.999365632141595,
-     "rc": 0.45,
-     "width": 0.041627660370093654
+     "floor": 0.9783935546875,
+     "ceil": 0.999267578125,
+     "rc": 0.74,
+     "width": 0.007118229794928689
     },
-    "aicc": -7.618454676099304
+    "aicc": 15.819010202260067
    }
   },
   "logistic_win_fraction": 0.0,
   "threshold_detected": null,
   "largest_jump": {
-   "from_ratio": 0.0,
-   "to_ratio": 0.5,
-   "delta": 0.08935546875
+   "from_ratio": 0.5,
+   "to_ratio": 1.0,
+   "delta": 0.026611328125
   },
   "n_points": 3,
   "n_seeds_min": 1

@@ -1,8 +1,9 @@
 # 2026-09-30 · 06 · Pilot v4 result: MQAR at r ∈ {0, 1/2, 1}, 4 layers (PILOT, one seed)
 
-> **Correction (same day, after the LR extension below):** the pure Mamba-2 failure in the first table was
-> mostly a learning-rate artifact. With LR 1e-2 it reaches 0.883 to 0.998. Interpretation points 1 and 2 are
-> withdrawn; see "LR extension" at the end.
+> **Correction (same day, after the LR extensions below):** the pure Mamba-2 failure in the first table was a
+> learning-rate artifact. With LR 3e-2 it reaches 0.984 to 1.000. Interpretation points 1 and 2 are withdrawn.
+> Final pilot reading: at L = 32, P ≤ 8 every architecture is at or near ceiling once its LR is tuned, so this
+> regime cannot measure attention need. See "Second LR extension" at the end.
 
 Sweep `configs/sweeps/pilot_mqar_v4.yaml`, tag `pilot_mqar_v4`, 10 runs, all completed. CPU only: 1.15 wall-hours,
 61.4M training tokens, $0 billed (`artifacts/compute_summary.csv`).
@@ -86,3 +87,34 @@ Test token accuracy with the re-selected LR, pure Mamba-2 (r = 0): P = 2 / 4 / 6
 
 The main sweep needs a per-architecture LR grid wide enough that the selected LR is interior for every cell, and
 the analysis should flag any cell whose selected LR is at a grid edge. Adding that check to the pipeline.
+
+## Second LR extension (MEASURED, test split, 1 seed)
+
+`configs/sweeps/pilot_mqar_v4_lr2.yaml`: pure Mamba-2 at 2e-2 and 3e-2. Validation (mean over P): 2e-2 → 0.992,
+3e-2 → 0.993 (selected; flat, so the grid edge no longer matters in practice). Test token accuracy, pure Mamba-2:
+P = 2 / 4 / 6 / 8 = 1.000 / 0.998 [0.995, 1.000] / 0.995 [0.993, 0.998] / 0.984 [0.980, 0.988].
+
+## Final pilot reading
+
+| architecture | r | selected LR | P = 8 test token accuracy |
+|---|---|---|---|
+| attention | 1 | 3e-3 | 0.999 |
+| Mamba-2 hybrid | 1/2 | 3e-3 | 0.973 |
+| Mamba-2 | 0 | 3e-2 | 0.984 |
+| Gated DeltaNet hybrid | 1/2 | 3e-3 | 1.000 |
+| Gated DeltaNet | 0 | 3e-3 | 0.995 |
+
+At this difficulty there is no attention requirement to measure; the remaining differences are ≤ 0.03 and come
+from one seed. (The Mamba-2 hybrid's 0.973 is below pure Mamba-2's 0.984 only because its LR grid stops at 1e-2;
+no conclusion drawn.) Pure Mamba-2 wants a 10x higher LR than attention.
+
+Lessons that carry into the main sweep:
+1. Per-architecture LR grids, spanning at least 1e-3 to 3e-2, with the edge flag checked before reporting.
+2. The CPU-trainable MQAR regime (L = 32, P ≤ 8, d = 64) is too easy. The informative regime needs longer
+   contexts or more pairs than state size comfortably holds, which on CPU did not train for attention in 1,500 to
+   2,000 steps (entries 03 to 05). That regime is a GPU job.
+
+## Decision
+
+MQAR on CPU is closed as uninformative-at-this-scale. Next CPU pilot: state tracking (parity), where the
+literature predicts qualitative differences (entry L18), with a 4-value LR grid from the start.
