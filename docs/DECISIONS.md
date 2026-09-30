@@ -29,3 +29,7 @@ With n_attn = n_layers the non-attention family is irrelevant. The sweep expande
 ## S7. Hyperparameters are selected on a validation split; results are reported on a disjoint test split (2026-09-30)
 
 Selecting the best LR on the same examples that are reported would inflate every cell by the max over LRs of the noise. Seeds for val and test come from separate namespaces (`src/attnratio/data/batches.py`).
+
+## S8. CPU pilot uses 4 layers (2026-09-30)
+
+At d = 64, 8-layer pure attention did not leave the MQAR plateau within 1,000 to 2,000 steps on mixed pair counts (log entries 01, 03, 05), while 4 layers did by step 500. The CPU pilot therefore uses 4 layers and the ratios 0, 1/2, 1. The 8- and 16-layer grid (needed for r = 1/8 and depth decoupling) runs on GPU with longer training, with an explicit check that every r = 1 baseline trains before any ratio comparison is made.
