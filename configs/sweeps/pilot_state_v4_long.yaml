@@ -1,0 +1,21 @@
+# Parity convergence check (not used for LR selection): pure attention and the r = 1/2 Mamba-2 hybrid were still
+# improving at 2,000 steps. Same configs at LR 1e-3, trained 4x longer, to separate "learns slowly" from
+# "converges to a worse capability". Separate tag.
+name: pilot_state_v4_long
+base:
+  task: state
+  model: {family: mamba2, vocab_size: 16, d_model: 64, n_layers: 4, n_attn: 4, placement: block_end, attn_heads: 2, gdn_heads: 4, mamba_head_dim: 8, mamba_d_state: 16, chunk: 32}
+  train:
+    - {seq_len: 64, difficulty: {group: parity}}
+  eval:
+    - {seq_len: 64, difficulty: {group: parity}}
+    - {seq_len: 128, difficulty: {group: parity}}
+    - {seq_len: 256, difficulty: {group: parity}}
+  steps: 8000
+  batch_size: 64
+  lr: 1.0e-3
+  eval_every: 1000
+  n_eval: 256
+  n_val: 128
+grid:
+  model.n_attn: [2, 4]
