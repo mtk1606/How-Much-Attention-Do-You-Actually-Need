@@ -1,0 +1,236 @@
+[
+ {
+  "task": "state",
+  "condition": "L=128, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.787994384765625,
+   0.7916259765625,
+   0.55487060546875
+  ],
+  "rc": null,
+  "rc_bootstrap_distribution": {
+   "None": 1.0
+  },
+  "non_monotone": false,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=128, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn_neg",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   1.0,
+   1.0,
+   0.55487060546875
+  ],
+  "rc": 0.0,
+  "rc_bootstrap_distribution": {
+   "0.0": 1.0
+  },
+  "non_monotone": true,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=128, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.8543701171875,
+   0.648895263671875,
+   0.55487060546875
+  ],
+  "rc": null,
+  "rc_bootstrap_distribution": {
+   "None": 1.0
+  },
+  "non_monotone": false,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=256, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.6439971923828125,
+   0.6422576904296875,
+   0.5263519287109375
+  ],
+  "rc": null,
+  "rc_bootstrap_distribution": {
+   "None": 1.0
+  },
+  "non_monotone": false,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=256, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn_neg",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.99951171875,
+   1.0,
+   0.5263519287109375
+  ],
+  "rc": 0.0,
+  "rc_bootstrap_distribution": {
+   "0.0": 1.0
+  },
+  "non_monotone": true,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=256, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.680877685546875,
+   0.5735626220703125,
+   0.5263519287109375
+  ],
+  "rc": null,
+  "rc_bootstrap_distribution": {
+   "None": 1.0
+  },
+  "non_monotone": false,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=64, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.98101806640625,
+   0.9913330078125,
+   0.6085205078125
+  ],
+  "rc": 0.0,
+  "rc_bootstrap_distribution": {
+   "0.0": 1.0
+  },
+  "non_monotone": true,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=64, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "gdn_neg",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   1.0,
+   1.0,
+   0.6085205078125
+  ],
+  "rc": 0.0,
+  "rc_bootstrap_distribution": {
+   "0.0": 1.0
+  },
+  "non_monotone": true,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ },
+ {
+  "task": "state",
+  "condition": "L=64, group=parity",
+  "d_model": 64,
+  "n_layers": 4,
+  "family": "mamba2",
+  "tau": 0.9,
+  "metric": "token_accuracy",
+  "ratios": [
+   0.0,
+   0.5,
+   1.0
+  ],
+  "means": [
+   0.996826171875,
+   0.79034423828125,
+   0.6085205078125
+  ],
+  "rc": 0.0,
+  "rc_bootstrap_distribution": {
+   "0.0": 1.0
+  },
+  "non_monotone": true,
+  "n_seeds_min": 1,
+  "any_lr_at_grid_edge": true
+ }
+]

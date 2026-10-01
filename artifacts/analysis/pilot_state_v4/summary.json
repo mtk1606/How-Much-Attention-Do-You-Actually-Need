@@ -1,0 +1,38 @@
+{
+ "tag": "pilot_state_v4",
+ "runs": 28,
+ "selected_runs": 7,
+ "cells_with_lr_at_grid_edge": [
+  [
+   "state",
+   "mamba2",
+   0,
+   4,
+   "block_end",
+   64
+  ],
+  [
+   "state",
+   "mamba2",
+   2,
+   4,
+   "block_end",
+   64
+  ],
+  [
+   "state",
+   "mamba2",
+   4,
+   4,
+   "block_end",
+   64
+  ]
+ ],
+ "headline_eligible": false,
+ "figures": [
+  "figures/pilot_state_v4_state_token_accuracy.png",
+  "figures/pilot_state_v4_state_exact_match.png",
+  "figures/pilot_state_v4_state_first_error.png"
+ ],
+ "analysis_dir": "/home/user/How-Much-Attention-Do-You-Actually-Need/artifacts/analysis/pilot_state_v4"
+}
