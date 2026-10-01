@@ -34,6 +34,8 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("analyze", help="aggregate results and write figures/tables for a sweep tag")
     p.add_argument("tag")
     p.add_argument("--out-dir", default="figures")
+    p.add_argument("--headline", action="store_true", help="refuse if any selected LR is at the grid edge")
+    p.add_argument("--tau", type=float, default=0.9, help="capability criterion for the attention frontier")
 
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
@@ -91,7 +93,7 @@ def main(argv: list[str] | None = None) -> None:
     elif args.cmd == "analyze":
         from .analysis.pipeline import analyze_tag
 
-        analyze_tag(args.tag, Path(args.out_dir))
+        analyze_tag(args.tag, Path(args.out_dir), headline=args.headline, tau=args.tau)
 
 
 if __name__ == "__main__":

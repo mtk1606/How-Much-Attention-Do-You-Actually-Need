@@ -87,25 +87,49 @@ def select_lr(runs: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[di
     return selected, log
 
 
-def aggregate(selected: list[dict[str, Any]], n_boot: int = 2000) -> list[dict[str, Any]]:
+class HeadlineBlocked(RuntimeError):
+    """Raised when a headline result is requested from a cell whose best LR is on the grid edge."""
+
+
+def check_headline_eligible(lr_log: list[dict[str, Any]]) -> None:
+    """Policy (GPU go/no-go, LR policy): no headline from a cell whose selected LR is at the grid edge."""
+    edge = [c["cell"] for c in lr_log if c["lr_at_grid_edge"]]
+    if edge:
+        raise HeadlineBlocked(f"selected LR at grid edge for {len(edge)} cell(s); expand the grid first: {edge}")
+
+
+METRICS = (
+    # (metric, per-example key, chance or None)
+    ("token_accuracy", "per_example_token_accuracy", "task"),
+    ("exact_match", "per_example_exact", 0.0),
+    ("first_error", "per_example_first_error", None),
+)
+
+
+def aggregate(
+    selected: list[dict[str, Any]], n_boot: int = 2000, lr_log: list[dict[str, Any]] | None = None
+) -> list[dict[str, Any]]:
     groups: dict[tuple, list[tuple[dict[str, Any], dict[str, Any]]]] = defaultdict(list)
     for r in selected:
         for t in r["final"]["test"]:
             cond = json.dumps({"seq_len": t["seq_len"], "difficulty": t["difficulty"]}, sort_keys=True)
             groups[(*_cell_key(r), cond)].append((r, t))
+    edge_cells = {tuple(c["cell"]): c["lr_at_grid_edge"] for c in (lr_log or [])}
     rows = []
     for (task, family, n_attn, n_layers, placement, d_model, cond), items in groups.items():
         c = json.loads(cond)
         token_chance = get_task(task).chance(c["difficulty"])
-        for metric, per_ex in (("token_accuracy", "per_example_token_accuracy"), ("exact_match", "per_example_exact")):
+        edge = edge_cells.get((task, family, n_attn, n_layers, placement, d_model), False)
+        for metric, per_ex, chance_spec in METRICS:
+            stored = "mean_first_error" if metric == "first_error" else metric
             per_seed = []
             for _, t in items:
                 if per_ex in t:
                     per_seed.append(np.asarray(t[per_ex], float))
-                else:  # runs from before per-example token accuracy was stored: aggregate value only
-                    per_seed.append(np.asarray([t[metric]], float))
+                else:  # runs from before per-example values were stored: aggregate value only
+                    per_seed.append(np.asarray([t[stored]], float))
             mean, lo, hi = hierarchical_bootstrap(per_seed, n_boot=n_boot)
-            chance = token_chance if metric == "token_accuracy" else 0.0  # exact match: effectively 0
+            chance = token_chance if chance_spec == "task" else chance_spec
             rows.append(
                 {
                     "task": task,
@@ -123,9 +147,10 @@ def aggregate(selected: list[dict[str, Any]], n_boot: int = 2000) -> list[dict[s
                     "ci_low": lo,
                     "ci_high": hi,
                     "chance": chance,
-                    "normalized": (mean - chance) / (1 - chance),
+                    "normalized": None if chance is None else (mean - chance) / (1 - chance),
                     "n_seeds": len(items),
-                    "seed_values": [float(t[metric]) for _, t in items],
+                    "seed_values": [float(t[stored]) for _, t in items],
+                    "lr_at_grid_edge": edge,
                     "experiment_ids": sorted(r["experiment_id"] for r, _ in items),
                     "lr": items[0][0]["lr"],
                 }
@@ -152,6 +177,55 @@ def curves_by_family(rows: list[dict[str, Any]], metric: str) -> dict[tuple, dic
     for key in out:
         for f in out[key]:
             out[key][f].sort(key=lambda x: x["attention_ratio"])
+    return out
+
+
+def frontier(
+    rows: list[dict[str, Any]], tau: float = 0.9, metric: str = "token_accuracy", n_boot: int = 2000, seed: int = 0
+) -> list[dict[str, Any]]:
+    """Minimum attention ratio reaching the criterion, per (task, condition, family): r_c = min{r : acc(r) >= tau}.
+
+    Point estimate uses seed means. Uncertainty: resample seeds within each ratio and recompute r_c; the
+    distribution over grid ratios is reported (r_c lives on the measured grid, so no interval is interpolated).
+    r_c is None when no measured ratio reaches tau. Non-monotone curves (a ratio above r_c falling below tau)
+    are flagged rather than smoothed.
+    """
+    rng = np.random.default_rng(seed)
+    out = []
+    for key, fams in curves_by_family(rows, metric).items():
+        for fam, pts in fams.items():
+            ratios = [p["attention_ratio"] for p in pts]
+            seeds = [np.asarray(p["seed_values"], float) for p in pts]
+
+            def rc_of(means: list[float], ratios: list[float] = ratios) -> float | None:
+                hit = [r for r, m in zip(ratios, means, strict=True) if m >= tau]
+                return min(hit) if hit else None
+
+            means = [float(sv.mean()) for sv in seeds]
+            rc = rc_of(means)
+            counts: dict[str, int] = defaultdict(int)
+            for _ in range(n_boot):
+                bm = [float(sv[rng.integers(0, sv.size, sv.size)].mean()) for sv in seeds]
+                counts[str(rc_of(bm))] += 1
+            out.append(
+                {
+                    "task": key[0],
+                    "condition": key[1],
+                    "d_model": key[2],
+                    "n_layers": key[3],
+                    "family": fam,
+                    "tau": tau,
+                    "metric": metric,
+                    "ratios": ratios,
+                    "means": means,
+                    "rc": rc,
+                    "rc_bootstrap_distribution": {k: v / n_boot for k, v in sorted(counts.items())},
+                    "non_monotone": rc is not None
+                    and any(m < tau for r, m in zip(ratios, means, strict=True) if r > rc),
+                    "n_seeds_min": int(min(sv.size for sv in seeds)),
+                    "any_lr_at_grid_edge": any(p.get("lr_at_grid_edge", False) for p in pts),
+                }
+            )
     return out
 
 
@@ -182,7 +256,9 @@ def plot_curves(rows: list[dict[str, Any]], tag: str, out_dir: Path, metric: str
         cols = min(n, 5)
         nrows = int(np.ceil(n / cols))
         width = max(5.2, 2.6 * cols + 0.4)
-        fig, axes = plt.subplots(nrows, cols, figsize=(width, 2.5 * nrows + 1.1), squeeze=False, sharey=True)
+        fig, axes = plt.subplots(
+            nrows, cols, figsize=(width, 2.5 * nrows + 1.1), squeeze=False, sharey=metric != "first_error"
+        )
         for ax, key in zip(axes.flat, keys, strict=False):
             for fam, pts in sorted(curves[key].items()):
                 x = [p["attention_ratio"] for p in pts]
@@ -192,10 +268,12 @@ def plot_curves(rows: list[dict[str, Any]], tag: str, out_dir: Path, metric: str
                 col = FAMILY_COLORS.get(fam, "#52514e")
                 ax.fill_between(x, lo, hi, color=col, alpha=0.15, linewidth=0)
                 ax.plot(x, y, "-o", color=col, lw=2, ms=4.5, label=FAMILY_LABELS.get(fam, fam))
-            ax.axhline(pts[0]["chance"], color="#9b9a95", lw=1, ls=":")
+            if pts[0]["chance"] is not None:
+                ax.axhline(pts[0]["chance"], color="#9b9a95", lw=1, ls=":")
             ax.set_title(", ".join(key[1].split(", ")[:2]), fontsize=9, color="#0b0b0b")
             ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
-            ax.set_ylim(-0.02, 1.02)
+            if metric != "first_error":
+                ax.set_ylim(-0.02, 1.02)
             ax.grid(True, color="#e6e5e0", lw=0.6)
             ax.spines[["top", "right"]].set_visible(False)
             ax.tick_params(labelsize=8, colors="#52514e")
@@ -230,19 +308,23 @@ def _sort_condition(label: str) -> tuple:
     return (tuple(nums), label)
 
 
-def analyze_tag(tag: str, out_dir: Path) -> dict[str, Any]:
+def analyze_tag(tag: str, out_dir: Path, headline: bool = False, tau: float = 0.9) -> dict[str, Any]:
     runs = load_runs(tag)
     if not runs:
         raise SystemExit(f"no completed runs tagged {tag!r} in {registry.ARTIFACTS}")
     selected, lr_log = select_lr(runs)
-    rows = aggregate(selected)
+    if headline:
+        check_headline_eligible(lr_log)
+    rows = aggregate(selected, lr_log=lr_log)
     thr = thresholds(rows)
+    front = frontier(rows, tau=tau)
     adir = registry.ARTIFACTS / "analysis" / tag
     adir.mkdir(parents=True, exist_ok=True)
     out_dir.mkdir(parents=True, exist_ok=True)
     (adir / "curves.json").write_text(json.dumps(rows, indent=1))
     (adir / "lr_selection.json").write_text(json.dumps(lr_log, indent=1))
     (adir / "thresholds.json").write_text(json.dumps(thr, indent=1))
+    (adir / "frontier.json").write_text(json.dumps(front, indent=1))
     flat = [{k: v for k, v in r.items() if k not in ("seed_values", "experiment_ids", "difficulty")} for r in rows]
     for r, f in zip(rows, flat, strict=True):
         f["experiment_ids"] = ";".join(r["experiment_ids"])
@@ -250,12 +332,13 @@ def analyze_tag(tag: str, out_dir: Path) -> dict[str, Any]:
         w = csv.DictWriter(fh, fieldnames=list(flat[0]))
         w.writeheader()
         w.writerows(flat)
-    figs = plot_curves(rows, tag, out_dir) + plot_curves(rows, tag, out_dir, "exact_match")
+    figs = [p for m in ("token_accuracy", "exact_match", "first_error") for p in plot_curves(rows, tag, out_dir, m)]
     summary = {
         "tag": tag,
         "runs": len(runs),
         "selected_runs": len(selected),
         "cells_with_lr_at_grid_edge": [c["cell"] for c in lr_log if c["lr_at_grid_edge"]],
+        "headline_eligible": not any(c["lr_at_grid_edge"] for c in lr_log),
         "figures": [str(p) for p in figs],
         "analysis_dir": str(adir),
     }

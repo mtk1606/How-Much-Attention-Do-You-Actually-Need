@@ -55,6 +55,8 @@ def _summary(results: list[dict[str, Any]]) -> dict[str, Any]:
         f"L{r['seq_len']}_{json.dumps(r['difficulty'], sort_keys=True)}": {
             "token_accuracy": r["token_accuracy"],
             "exact_match": r["exact_match"],
+            "mean_first_error": r["mean_first_error"],
+            "loss": r["loss"],
         }
         for r in results
     }
