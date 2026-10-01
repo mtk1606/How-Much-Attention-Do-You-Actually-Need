@@ -3,7 +3,7 @@ name = "attnratio"
 version = "0.1.0"
 description = "How much attention does a hybrid sequence model need, per capability? Controlled attention-ratio sweeps on mechanistic probes."
 authors = [{ name = "Mohamed El Khoudimi" }]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
   "torch>=2.3",
@@ -34,7 +34,7 @@ addopts = "-q"
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py310"
 extend-exclude = ["tests/reference"]
 
 [tool.ruff.lint]

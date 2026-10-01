@@ -35,7 +35,7 @@ The script, in order, stopping at the first failure:
    peak VRAM, batch-generation share and GPU utilisation, projects G1a hours and dollars, and **exits non-zero if
    projected G1a cost > $15, projected time > 24 h, batch generation > 50% of a step, or GPU utilisation < 30%**.
    Output: `artifacts/g0_benchmark.json`.
-5. **G1a**: 18 runs, under a wall-clock limit computed from the remaining budget minus a $1 margin.
+5. **Stops here by default.** Only with `RUN_G1A=1` (after G0 is reviewed): **G1a**, 18 runs, under a wall-clock limit computed from the remaining budget minus a $1 margin.
 6. Calibration analysis (`attnratio analyze gpu_g1`, not a headline), compute summary, commit and push.
 7. Reminds you to terminate the instance (or stops a RunPod pod with `AUTO_STOP=1`).
 

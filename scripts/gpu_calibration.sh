@@ -3,6 +3,7 @@
 #
 #   USD_PER_HOUR=0.79 PROVIDER=RunPod bash scripts/gpu_calibration.sh
 #
+# By default it STOPS AFTER G0 (tests, smoke, benchmark). Set RUN_G1A=1 to continue into G1a after G0 was reviewed.
 # Optional: BUDGET_USD (default 25), SPENT_USD (already billed before this script, default 0.5 for boot/setup),
 #           WORKERS (concurrent runs, default 3), AUTO_STOP=1 (stop a RunPod pod when done, needs runpodctl).
 # Stops (exit != 0) at the first failed gate: GPU tests, smoke run, G0 benchmark gate, or the dollar guard.
@@ -44,6 +45,10 @@ ATTNRATIO_ARTIFACTS=artifacts/smoke_gpu python3 -m attnratio.cli sweep configs/s
 echo "== G0 step 3: throughput benchmark and gate"
 python3 scripts/g0_benchmark.py --usd-per-hour "$USD_PER_HOUR" --provider "$PROVIDER" --workers "$WORKERS"
 # (exits 3 if the projected G1a cost > $15, time > 24 h, or a data/launch bottleneck is detected)
+if [ "${RUN_G1A:-0}" != "1" ]; then
+  echo "== G0 complete. Stopping before G1a (RUN_G1A is not 1). Send back artifacts/g0_benchmark.json and $LOG."
+  exit 0
+fi
 
 echo "== G1a: 18 runs (pure attention / Mamba-2 / Gated DeltaNet x L in {64, 256, 512} x 2 LRs, seed 0)"
 REMAINING=$(python3 -c "print($BUDGET_USD - $(spent_now) - 1.0)")  # keep $1 margin for analysis and shutdown

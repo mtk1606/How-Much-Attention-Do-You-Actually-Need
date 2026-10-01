@@ -6,7 +6,7 @@ import json
 import logging
 import math
 import time
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import torch
@@ -97,7 +97,7 @@ def train_run(cfg: RunConfig, device: str | None = None, resume_ok: bool = True)
         "training_tokens": cfg.steps * cfg.batch_size * max(s.seq_len for s in cfg.train),
         "hardware": registry.hardware(),
         "precision": cfg.precision,
-        "start_time": datetime.now(UTC).isoformat(),
+        "start_time": datetime.now(timezone.utc).isoformat(),
         "status": "running",
         "tags": list(cfg.tags),
     }
@@ -158,7 +158,7 @@ def train_run(cfg: RunConfig, device: str | None = None, resume_ok: bool = True)
     gpu_hours = wall / 3600 * hw.get("gpu_count", 0)
     meta.update(
         {
-            "end_time": datetime.now(UTC).isoformat(),
+            "end_time": datetime.now(timezone.utc).isoformat(),
             "status": "diverged" if diverged else "completed",
             "wall_seconds": round(wall, 2),
             "tokens_processed": tokens_seen,

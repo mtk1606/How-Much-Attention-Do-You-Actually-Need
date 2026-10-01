@@ -90,7 +90,7 @@ def test_checkpoint_roundtrip_and_registry(tmp_path, monkeypatch):
 
     monkeypatch.setattr(registry, "ARTIFACTS", tmp_path)
     cfg = load_run_config("configs/training/smoke.yaml")
-    r1 = train_run(cfg)
+    r1 = train_run(cfg, device="cpu")
     assert r1["status"] == "completed"
     ckpt = torch.load(tmp_path / "runs" / cfg.experiment_id / "ckpt.pt", weights_only=False)
     model = HybridLM(cfg.model)
@@ -105,7 +105,7 @@ def test_checkpoint_roundtrip_and_registry(tmp_path, monkeypatch):
     reg = registry.load_registry()
     assert [x["experiment_id"] for x in reg] == [cfg.experiment_id]
     # Re-running is a no-op that returns the stored result.
-    r2 = train_run(cfg)
+    r2 = train_run(cfg, device="cpu")
     assert json.dumps(r2, sort_keys=True) == json.dumps(r1, sort_keys=True)
 
 
@@ -117,7 +117,7 @@ def test_training_is_seed_deterministic(tmp_path, monkeypatch):
     losses = []
     for i in range(2):
         monkeypatch.setattr(registry, "ARTIFACTS", tmp_path / str(i))
-        losses.append(train_run(cfg)["metadata"]["final_train_loss_ema"])
+        losses.append(train_run(cfg, device="cpu")["metadata"]["final_train_loss_ema"])
     assert losses[0] == losses[1]
 
 

@@ -19,7 +19,7 @@ import subprocess
 import sys
 import threading
 import time
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import torch
@@ -151,7 +151,7 @@ def main() -> None:
         reasons.append(f"mean GPU utilisation {mean_util:.0f}% with one process (launch-bound)")
 
     report = {
-        "timestamp": datetime.now(UTC).isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "provider": args.provider,
         "usd_per_hour": args.usd_per_hour,
         "device": torch.cuda.get_device_name() if device == "cuda" else "cpu",
