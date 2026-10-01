@@ -4,7 +4,7 @@ Updated: 2026-10-01
 
 ## Current phase
 
-CPU phase frozen (log entry 08). Waiting for GPU budget approval (`docs/GPU_GO_NO_GO.md`).
+Calibration (G0 + G1a) approved, $25 hard maximum. Blocked on GPU access: this container cannot rent a GPU (provider APIs blocked, no key). Runbook: `docs/GPU_RUNBOOK.md`. $0 spent.
 
 ## Current hypothesis
 
@@ -22,14 +22,14 @@ See `docs/EXPERIMENT_DESIGN.md` §2. Revised from the brief: state tracking is e
 
 ## Blocked
 
-- Paid GPU compute: needs the owner's approval ($25 for G0 + G1; $150 total cap) and GPU access (`docs/GPU_GO_NO_GO.md`).
+- GPU access for the approved calibration: either the owner runs `scripts/gpu_calibration.sh` on a rented L40S/A100, or the environment gets the provider API host allowed and a `RUNPOD_API_KEY`.
 - Full-text reading of arXiv PDFs (arxiv.org and huggingface.co are blocked by this container's network policy). Several literature rows are VERIFIED-EXCERPT only.
 
 ## Next three actions
 
-1. On approval: G0 throughput benchmark on the rented GPU; replace the assumed throughput in the go/no-go doc.
-2. G1 calibration (36 runs) and its gate.
-3. G2 ratio map only if the G1 gate passes.
+1. G0 on a rented GPU via `scripts/gpu_calibration.sh` (tests, smoke, benchmark gate).
+2. G1a (18 runs) if G0 passes; LR-edge extensions only for the affected architecture/length.
+3. Report G2 GO/NO-GO to the owner. G2 is not approved.
 
 ## Measured results
 

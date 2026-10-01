@@ -1,6 +1,6 @@
 # GPU go / no-go
 
-Status: **awaiting owner approval. No paid compute has been used.** Written 2026-10-01 after the CPU phase was frozen (`research/experiment_log/2026-10-01_08_cpu_freeze.md`; parity pilot in entry 07).
+Status: **calibration approved ($25 hard maximum, 2026-10-01); G0 not yet run (blocked: no GPU access from the development container, see docs/GPU_RUNBOOK.md). $0 spent.** G2 is not approved. Written 2026-10-01 after the CPU phase was frozen (`research/experiment_log/2026-10-01_08_cpu_freeze.md`; parity pilot in entry 07).
 
 ## Question the spend answers
 
@@ -25,6 +25,30 @@ price pages): L40S $0.72 to $0.79/h; A100 80GB $1.19 to $2.79/h; H100 $1.99 to $
 [Spheron comparison](https://www.spheron.network/blog/gpu-cloud-pricing-comparison-2026/),
 [BuildMVPFast](https://www.buildmvpfast.com/api-costs/gpu),
 [Synpix Lambda pricing](https://www.synpixcloud.com/blog/lambda-labs-gpu-pricing-2026).
+
+## G1a design: what one run covers
+
+Each G1a run is one (architecture, sequence length L, LR) with seed 0. Its training stream is a **round-robin
+mixture of the three memory loads K for that L** (each step's batch uses one K, cycling through the three), and it
+is **evaluated separately at each K** on held-out validation and test examples. So the 18 runs are
+3 architectures × 3 lengths × 2 LRs; K is an evaluation axis inside each run, not a separate training
+configuration. G1a yields 18 × 3 = 54 evaluation cells from 18 trainings. Consequence: accuracy at one K reflects a
+model trained on all three K for that L; per-K training is not tested in calibration.
+
+## G0 record (to be filled from artifacts/g0_benchmark.json)
+
+| field | value |
+|---|---|
+| provider | not yet run |
+| exact GPU / VRAM | – |
+| hourly price (checkout) | – |
+| vCPUs / RAM | – |
+| CUDA / PyTorch | – |
+| tokens/s per config (L = 64 / 256 / 512) | – |
+| peak VRAM | – |
+| benchmark wall time | – |
+| projected G1a wall time / cost | – |
+| gate | – |
 
 ## Measured throughput
 
