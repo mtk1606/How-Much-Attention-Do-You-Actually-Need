@@ -1,0 +1,68 @@
+experiment_id: state_gdn_a2of4_block_end_d64_L64_lr1e-3_s0_d58fc504
+git_commit: c00f0d2816622cb56548f0e6134d27f42f208b38
+git_dirty: false
+model_config:
+  family: gdn
+  vocab_size: 16
+  d_model: 64
+  n_layers: 4
+  n_attn: 2
+  placement: block_end
+  attn_heads: 2
+  rope_fraction: 1.0
+  mlp_ratio: 2.0
+  mamba_head_dim: 8
+  mamba_d_state: 16
+  gdn_heads: 4
+  d_conv: 4
+  chunk: 32
+  extra: {}
+  attention_ratio: 0.5
+dataset_config:
+  task: state
+  train:
+  - seq_len: 64
+    difficulty:
+      group: parity
+  eval:
+  - seq_len: 64
+    difficulty:
+      group: parity
+  - seq_len: 128
+    difficulty:
+      group: parity
+  - seq_len: 256
+    difficulty:
+      group: parity
+attention_ratio: 0.5
+attention_placement: block_end
+architecture: gdn
+layer_types: SASA
+seed: 0
+parameter_count: 167792
+non_embedding_parameters: 166768
+attention_mixer_params_per_layer: 16384
+other_mixer_params_per_layer: 17560
+mixer_param_ratio_other_over_attention: 1.07177734375
+recurrent_state_numel_per_layer: 512
+kv_cache_numel_at_seq_len: 65536
+training_tokens: 8192000
+hardware:
+  device: cpu
+  cpu_threads: 2
+  gpu_count: 0
+  host: vm
+precision: fp32
+start_time: '2026-10-01T00:12:58.536956+00:00'
+status: completed
+tags:
+- pilot_state_v4
+end_time: '2026-10-01T00:20:00.687869+00:00'
+wall_seconds: 418.93
+tokens_processed: 8192000
+gpu_hours: 0.0
+estimated_cost_usd: 0.0
+peak_memory_mb: 934.9
+checkpoint_path: artifacts/runs/state_gdn_a2of4_block_end_d64_L64_lr1e-3_s0_d58fc504/ckpt.pt
+metrics_path: artifacts/runs/state_gdn_a2of4_block_end_d64_L64_lr1e-3_s0_d58fc504/metrics.jsonl
+final_train_loss_ema: 0.05543142558963178

@@ -1,6 +1,6 @@
 # GPU go / no-go
 
-Status: **awaiting owner approval. No paid compute has been used.** Written 2026-10-01 after the CPU phase was frozen (`research/experiment_log/2026-10-01_08_cpu_freeze.md`).
+Status: **awaiting owner approval. No paid compute has been used.** Written 2026-10-01 after the CPU phase was frozen (`research/experiment_log/2026-10-01_08_cpu_freeze.md`; parity pilot in entry 07).
 
 ## Question the spend answers
 

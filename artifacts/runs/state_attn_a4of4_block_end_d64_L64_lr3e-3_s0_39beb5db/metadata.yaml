@@ -1,0 +1,68 @@
+experiment_id: state_attn_a4of4_block_end_d64_L64_lr3e-3_s0_39beb5db
+git_commit: c00f0d2816622cb56548f0e6134d27f42f208b38
+git_dirty: false
+model_config:
+  family: mamba2
+  vocab_size: 16
+  d_model: 64
+  n_layers: 4
+  n_attn: 4
+  placement: block_end
+  attn_heads: 2
+  rope_fraction: 1.0
+  mlp_ratio: 2.0
+  mamba_head_dim: 8
+  mamba_d_state: 16
+  gdn_heads: 4
+  d_conv: 4
+  chunk: 32
+  extra: {}
+  attention_ratio: 1.0
+dataset_config:
+  task: state
+  train:
+  - seq_len: 64
+    difficulty:
+      group: parity
+  eval:
+  - seq_len: 64
+    difficulty:
+      group: parity
+  - seq_len: 128
+    difficulty:
+      group: parity
+  - seq_len: 256
+    difficulty:
+      group: parity
+attention_ratio: 1.0
+attention_placement: block_end
+architecture: mamba2
+layer_types: AAAA
+seed: 0
+parameter_count: 165440
+non_embedding_parameters: 164416
+attention_mixer_params_per_layer: 16384
+other_mixer_params_per_layer: 0
+mixer_param_ratio_other_over_attention: 1.0
+recurrent_state_numel_per_layer: 0
+kv_cache_numel_at_seq_len: 131072
+training_tokens: 8192000
+hardware:
+  device: cpu
+  cpu_threads: 2
+  gpu_count: 0
+  host: vm
+precision: fp32
+start_time: '2026-09-30T23:51:27.403826+00:00'
+status: completed
+tags:
+- pilot_state_v4
+end_time: '2026-09-30T23:55:12.031753+00:00'
+wall_seconds: 222.96
+tokens_processed: 8192000
+gpu_hours: 0.0
+estimated_cost_usd: 0.0
+peak_memory_mb: 806.1
+checkpoint_path: artifacts/runs/state_attn_a4of4_block_end_d64_L64_lr3e-3_s0_39beb5db/ckpt.pt
+metrics_path: artifacts/runs/state_attn_a4of4_block_end_d64_L64_lr3e-3_s0_39beb5db/metrics.jsonl
+final_train_loss_ema: 0.6436963373151533

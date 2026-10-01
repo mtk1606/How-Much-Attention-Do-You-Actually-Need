@@ -1,34 +1,9 @@
 {
  "tag": "pilot_state_v4",
- "runs": 28,
+ "runs": 34,
  "selected_runs": 7,
- "cells_with_lr_at_grid_edge": [
-  [
-   "state",
-   "mamba2",
-   0,
-   4,
-   "block_end",
-   64
-  ],
-  [
-   "state",
-   "mamba2",
-   2,
-   4,
-   "block_end",
-   64
-  ],
-  [
-   "state",
-   "mamba2",
-   4,
-   4,
-   "block_end",
-   64
-  ]
- ],
- "headline_eligible": false,
+ "cells_with_lr_at_grid_edge": [],
+ "headline_eligible": true,
  "figures": [
   "figures/pilot_state_v4_state_token_accuracy.png",
   "figures/pilot_state_v4_state_exact_match.png",
