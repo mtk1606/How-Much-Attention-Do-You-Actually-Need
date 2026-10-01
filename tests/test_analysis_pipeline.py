@@ -59,3 +59,10 @@ def test_headline_gate_blocks_edge_cells():
     check_headline_eligible([{"cell": ["a"], "lr_at_grid_edge": False}])
     with pytest.raises(HeadlineBlocked):
         check_headline_eligible([{"cell": ["a"], "lr_at_grid_edge": False}, {"cell": ["b"], "lr_at_grid_edge": True}])
+
+
+def test_headline_gate_requires_three_seeds():
+    ok = [{"cell": ["a"], "lr_at_grid_edge": False}]
+    check_headline_eligible(ok, [_row("gdn", 0.0, [0.9, 0.9, 0.9]) | {"n_seeds": 3}])
+    with pytest.raises(HeadlineBlocked):
+        check_headline_eligible(ok, [_row("gdn", 0.0, [0.9]) | {"n_seeds": 1}])

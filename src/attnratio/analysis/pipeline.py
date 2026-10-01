@@ -91,11 +91,20 @@ class HeadlineBlocked(RuntimeError):
     """Raised when a headline result is requested from a cell whose best LR is on the grid edge."""
 
 
-def check_headline_eligible(lr_log: list[dict[str, Any]]) -> None:
-    """Policy (GPU go/no-go, LR policy): no headline from a cell whose selected LR is at the grid edge."""
+MIN_HEADLINE_SEEDS = 3
+
+
+def check_headline_eligible(lr_log: list[dict[str, Any]], rows: list[dict[str, Any]] | None = None) -> None:
+    """Policy (docs/GPU_GO_NO_GO.md): no headline from a cell whose selected LR is at the grid edge, or from a
+    cell with fewer than MIN_HEADLINE_SEEDS training seeds at the selected LR."""
     edge = [c["cell"] for c in lr_log if c["lr_at_grid_edge"]]
     if edge:
         raise HeadlineBlocked(f"selected LR at grid edge for {len(edge)} cell(s); expand the grid first: {edge}")
+    thin = sorted(
+        {(r["family"], r["attention_ratio"], r["condition"]) for r in rows or [] if r["n_seeds"] < MIN_HEADLINE_SEEDS}
+    )
+    if thin:
+        raise HeadlineBlocked(f"{len(thin)} cell(s) have fewer than {MIN_HEADLINE_SEEDS} seeds: {thin[:5]}")
 
 
 METRICS = (
@@ -313,9 +322,9 @@ def analyze_tag(tag: str, out_dir: Path, headline: bool = False, tau: float = 0.
     if not runs:
         raise SystemExit(f"no completed runs tagged {tag!r} in {registry.ARTIFACTS}")
     selected, lr_log = select_lr(runs)
-    if headline:
-        check_headline_eligible(lr_log)
     rows = aggregate(selected, lr_log=lr_log)
+    if headline:
+        check_headline_eligible(lr_log, rows)
     thr = thresholds(rows)
     front = frontier(rows, tau=tau)
     adir = registry.ARTIFACTS / "analysis" / tag

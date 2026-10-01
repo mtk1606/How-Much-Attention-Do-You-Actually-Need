@@ -1,6 +1,8 @@
 """Generate the GPU sweep files (docs/GPU_GO_NO_GO.md) from one spec, so the grid lives in code.
 
 Stages:
+  g1a smallest calibration: g1 with the two middle LRs per family (18 runs). Same tag as g1, so adding the
+      edge LRs later reuses these runs.
   g1  calibration: pure attention / pure Mamba-2 / pure Gated DeltaNet x L in {64, 256, 512} x per-family LR grid,
       1 seed. Answers trainability at depth 8, informative (L, K) region, LR ranges.
   g2  broad ratio map: r in {0, 1/8, 1/4, 1/2, 1} x 2 families x L grid x per-family LR grid, 1 seed.
@@ -79,10 +81,19 @@ def write(stage: str, sweeps: list[tuple[str, dict]]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", choices=["g1", "g2", "g3"], required=True)
+    ap.add_argument("--stage", choices=["g1a", "g1", "g2", "g3"], required=True)
     ap.add_argument("--lr-table", help="g3: JSON {family/n_attn/L: lr} from the g2 validation selection")
     args = ap.parse_args()
-    if args.stage == "g1":
+    if args.stage == "g1a":
+        # Smallest calibration: pure models only, the two middle LRs of each family's grid. Edge LRs are added
+        # (stage g1) only for families whose g1a optimum is on the 2-point edge, which is expected and cheap.
+        out = []
+        for L in (64, 256, 512):
+            out.append((f"attention_L{L}.yaml", sweep("gpu_g1", "attention", [8], L, LR_GRID["attention"][1:3], [0])))
+            for fam in ("mamba2", "gdn"):
+                out.append((f"{fam}_L{L}.yaml", sweep("gpu_g1", fam, [0], L, LR_GRID[fam][1:3], [0])))
+        write("g1a", out)
+    elif args.stage == "g1":
         out = []
         for L in (64, 256, 512):
             out.append((f"attention_L{L}.yaml", sweep("gpu_g1", "attention", [8], L, LR_GRID["attention"], [0])))
