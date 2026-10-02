@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>How Much Attention Do You Actually Need? — Mohamed El Khoudimi</title>
+  <meta name="description" content="I am testing how much softmax attention hybrid sequence models actually need, capability by capability. The main GPU sweep is pending; the CPU pilots already exposed an optimization confound and a state-tracking counterexample.">
+  <meta name="author" content="Mohamed El Khoudimi">
+  <link rel="canonical" href="https://mtk1606.github.io/How-Much-Attention-Do-You-Actually-Need/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mohamed El Khoudimi">
+  <meta property="og:title" content="How Much Attention Do You Actually Need?">
+  <meta property="og:description" content="A controlled study of attention ratio, memory, and state tracking in hybrid sequence models. Main sweep pending; pilot findings are clearly separated from final claims.">
+  <meta property="og:url" content="https://mtk1606.github.io/How-Much-Attention-Do-You-Actually-Need/">
+  <meta property="og:image" content="https://mtk1606.github.io/How-Much-Attention-Do-You-Actually-Need/figures/pilot_state_v4_state_first_error.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#f7f7f4">
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"TechArticle",
+    "headline":"How Much Attention Do You Actually Need?",
+    "author":{"@type":"Person","name":"Mohamed El Khoudimi"},
+    "about":["attention","state space models","sequence modeling","Mamba-2","Gated DeltaNet","memory"],
+    "codeRepository":"https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need"
+  }
+  </script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head frame">
+  <span><strong>Mohamed El Khoudimi</strong> · Sequence modeling research</span>
+  <nav aria-label="Sections">
+    <a href="#question">Question</a>
+    <a href="#design">Design</a>
+    <a href="#pilots">Pilots</a>
+    <a href="#engineering">Engineering</a>
+    <a href="#status">Status</a>
+    <a href="#sources">Sources</a>
+  </nav>
+</header>
+
+<main id="main" class="frame">
+  <section class="hero" aria-labelledby="title">
+    <p class="eyebrow">Hybrid sequence models</p>
+    <h1 id="title">How Much Attention Do You Actually Need?</h1>
+    <p class="subtitle">I am measuring when a hybrid model genuinely needs softmax attention, and when the recurrent update matters more.</p>
+    <p class="lede">
+      Modern sequence models increasingly mix a small number of attention layers into larger stacks of recurrent or state-space layers.
+      That saves compute, but it leaves a basic question unanswered: <strong>which capabilities actually need those expensive attention layers?</strong>
+      I built a controlled experiment to measure the response curve rather than assume one ratio works for everything.
+    </p>
+
+    <dl class="meta">
+      <div><dt>Variable</dt><dd>attention mixers / all sequence mixers</dd></div>
+      <div><dt>Ratios</dt><dd>0, 1/8, 1/4, 1/2, 1</dd></div>
+      <div><dt>Families</dt><dd>Mamba-2 · Gated DeltaNet · negative-eigenvalue control</dd></div>
+      <div><dt>Probes</dt><dd>retrieval · copy · needle · state tracking · induction</dd></div>
+    </dl>
+
+    <p class="status-line">
+      <strong>Research status:</strong> the full capability sweep has not run yet. The infrastructure is complete and tested; CPU pilots are measured and reported below as pilots, not final results.
+    </p>
+
+    <div class="hero-links">
+      <a href="#pilots">What the pilots already changed</a>
+      <a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need">Source and results</a>
+      <a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/docs/EXPERIMENT_DESIGN.md">Experiment design</a>
+    </div>
+  </section>
+
+  <section class="step" id="question" aria-labelledby="question-title">
+    <div class="rail">01 <b>The question</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="question-title">Attention is powerful. It is also the part that gets more expensive as context grows.</h2>
+        <p>
+          A recurrent or state-space layer compresses the past into a running state. An attention layer can look back at individual tokens directly.
+          Hybrid models combine the two: most layers move information recurrently, while occasional attention layers restore direct content lookup.
+        </p>
+        <p>
+          The useful quantity is not “does attention help?” It is the <em>shape</em> of capability versus attention ratio:
+          does performance improve gradually, jump after one attention layer, or remain flat because the recurrent update already solves the task?
+        </p>
+      </div>
+
+      <figure class="figure" aria-labelledby="arch-title">
+        <div class="figure-head">
+          <p class="figure-kicker">Interactive architecture sketch · not a result</p>
+          <h3 id="arch-title">Sixteen sequence mixers, with attention inserted at a chosen ratio</h3>
+          <p class="takeaway">Change the ratio and placement. The expensive layers are the dark ones; the research asks what capability is lost when I remove them.</p>
+        </div>
+
+        <div class="arch-controls" aria-label="Architecture controls">
+          <fieldset>
+            <legend>Attention ratio</legend>
+            <div class="text-tabs" id="ratio-tabs">
+              <button type="button" data-ratio="0">0</button>
+              <button type="button" data-ratio="0.125">1/8</button>
+              <button type="button" data-ratio="0.25" aria-pressed="true">1/4</button>
+              <button type="button" data-ratio="0.5">1/2</button>
+              <button type="button" data-ratio="1">1</button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Placement</legend>
+            <div class="text-tabs" id="placement-tabs">
+              <button type="button" data-placement="block_end" aria-pressed="true">block end</button>
+              <button type="button" data-placement="front">front</button>
+              <button type="button" data-placement="back">back</button>
+              <button type="button" data-placement="middle">middle</button>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="stack-visual" id="stack-visual" role="img" aria-label="Sixteen-layer hybrid stack with four attention layers and twelve recurrent layers."></div>
+        <p class="stack-summary" id="stack-summary">4 attention layers + 12 recurrent layers · r = 1/4</p>
+
+        <div class="legend">
+          <span><i class="swatch attn"></i> softmax attention</span>
+          <span><i class="swatch recurrent"></i> recurrent / state-space mixer</span>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="step" id="design" aria-labelledby="design-title">
+    <div class="rail">02 <b>The design</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="design-title">I separate five capabilities instead of collapsing everything into one language-model loss.</h2>
+        <p>
+          The main sweep compares matched hybrid stacks across two recurrent families and five attention ratios.
+          Parameters are matched within 3% across families and ratios. Learning rate is selected on a validation split; every reported capability number comes from a separate test split.
+        </p>
+      </div>
+
+      <div class="probe-ledger" role="list" aria-label="Capability probes">
+        <div role="listitem"><span>Retrieval</span><strong>Multi-query associative recall</strong><p>Can the model retrieve the value associated with a key as the number of bindings grows?</p></div>
+        <div role="listitem"><span>Copy</span><strong>Exact copying</strong><p>Can information survive over a gap without drift or interference?</p></div>
+        <div role="listitem"><span>Long range</span><strong>Needle in a haystack</strong><p>Can a sparse target be recovered among distractors as context grows?</p></div>
+        <div role="listitem"><span>State</span><strong>Finite-group tracking</strong><p>Can the update rule maintain an exact evolving state beyond the training length?</p></div>
+        <div role="listitem"><span>Induction</span><strong>In-context bigram copying</strong><p>When does a repeated pattern become usable, and does one attention layer suffice?</p></div>
+      </div>
+
+      <div class="prose">
+        <h3>What would count as a threshold</h3>
+        <p>
+          I only report a critical ratio if a logistic transition beats linear and constant alternatives strongly enough:
+          the logistic must beat linear by ΔAIC &gt; 4 in at least 80% of bootstrap resamples. With only five coarse ratios, any transition is then refined with 16-layer points rather than treated as exact.
+        </p>
+        <p>
+          I also test the simpler competing explanation directly: maybe <strong>attention layer count</strong>, not ratio, is what matters.
+          One attention layer in an 8-layer model and one in a 16-layer model separate those hypotheses.
+        </p>
+      </div>
+
+      <div class="design-sequence" aria-label="Research sequence">
+        <div><span>1</span><strong>Match models</strong><p>same parameter budget, different sequence mixer</p></div>
+        <div><span>2</span><strong>Tune fairly</strong><p>validation-only learning-rate selection per cell</p></div>
+        <div><span>3</span><strong>Replicate</strong><p>three training seeds are the unit of replication</p></div>
+        <div><span>4</span><strong>Test separately</strong><p>disjoint examples and deterministic generators</p></div>
+        <div><span>5</span><strong>Refine only where needed</strong><p>add ratios inside a detected transition</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="pilots" aria-labelledby="pilots-title">
+    <div class="rail">03 <b>Pilot findings</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="pilots-title">The pilots have not answered the main question. They have already killed two tempting stories.</h2>
+        <p>
+          These runs use one seed and small CPU-trainable models. I use them to debug the experiment, not to claim the final attention ratio.
+          Two lessons are strong enough to change the design because they expose confounds that would otherwise produce believable wrong conclusions.
+        </p>
+      </div>
+
+      <article class="finding">
+        <header>
+          <span>Pilot 01 · MQAR · one seed</span>
+          <h3>An apparent Mamba-2 failure disappeared when I widened the learning-rate grid.</h3>
+        </header>
+        <div class="prose">
+          <p>
+            My first pass made pure Mamba-2 look dramatically worse than attention and Gated DeltaNet.
+            That result was not architectural. The grid stopped too low.
+          </p>
+          <p>
+            At P = 8, pure Mamba-2 moved from <strong>0.264</strong> token accuracy in the first table to <strong>0.984</strong> after selecting LR 3e-2.
+            Pure attention preferred 3e-3 and collapsed at 1e-2. The models wanted learning rates roughly an order of magnitude apart.
+          </p>
+          <p class="conclusion">
+            Final pilot reading: at L = 32 and P ≤ 8, every architecture reaches at least 0.973 after tuning. This regime is too easy to measure attention need.
+          </p>
+        </div>
+        <figure class="result-figure">
+          <img src="./figures/pilot_mqar_v4_mqar_token_accuracy.png" alt="Measured MQAR pilot token accuracy across architectures and attention ratios.">
+          <figcaption>Measured pilot figure from the repository. One seed; test split. The experiment log preserves the original misleading reading and both learning-rate corrections.</figcaption>
+        </figure>
+        <p class="source-note"><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/research/experiment_log/2026-09-30_06_pilot_v4_result.md">Read the full MQAR experiment log →</a></p>
+      </article>
+
+      <article class="finding">
+        <header>
+          <span>Pilot 02 · parity · one seed</span>
+          <h3>On parity, adding attention did not fix length generalization. Changing the recurrent update did.</h3>
+        </header>
+        <div class="prose">
+          <p>
+            Models trained at length 64 were evaluated at 64, 128 and 256. Vanilla Mamba-2, vanilla Gated DeltaNet, their hybrids, and pure attention all failed to extrapolate once the sequence extended past the training regime.
+          </p>
+          <p>
+            A Gated DeltaNet variant allowed negative eigenvalues through β ∈ (0, 2). With <strong>zero attention</strong>, it reached exact-sequence accuracy 1.00 / 1.00 / 0.996 at lengths 64 / 128 / 256. Its r = 1/2 hybrid reached 1.00 / 1.00 / 1.00.
+          </p>
+          <p class="conclusion">
+            In this pilot, attention was neither necessary nor sufficient for length-general parity. The recurrent update rule determined the qualitative behavior.
+          </p>
+        </div>
+        <figure class="result-figure">
+          <img src="./figures/pilot_state_v4_state_first_error.png" alt="Measured parity pilot showing the first error position across model families and test lengths.">
+          <figcaption>Measured pilot figure. One seed, four layers, d = 64. The project does not treat this as a universal claim about transformers or large language models.</figcaption>
+        </figure>
+        <p class="source-note"><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/research/experiment_log/2026-10-01_07_parity_result.md">Read the full parity experiment log →</a></p>
+      </article>
+    </div>
+  </section>
+
+  <section class="step" id="engineering" aria-labelledby="engineering-title">
+    <div class="rail">04 <b>Engineering</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="engineering-title">The experiment is built to make architecture mistakes difficult to hide.</h2>
+        <p>
+          I implemented the sequence mixers in pure PyTorch so the full stack can run on CPU and remain inspectable.
+          The point is not kernel speed; it is having a reference implementation whose behavior I can compare against equations and upstream references before spending GPU compute.
+        </p>
+      </div>
+
+      <div class="engineering-ledger">
+        <div><strong>Mamba-2</strong><p>Chunked implementation checked against token-by-token recurrence and the official minimal SSD reference.</p></div>
+        <div><strong>Gated DeltaNet</strong><p>Chunked form checked against its recurrence, including the negative-eigenvalue state-tracking control.</p></div>
+        <div><strong>Matched hybrids</strong><p>8- and 16-layer schedules with explicit attention placement and parameter matching within 3%.</p></div>
+        <div><strong>Deterministic probes</strong><p>Generators test label correctness, answer leakage, and train/validation/test disjointness.</p></div>
+        <div><strong>Experiment registry</strong><p>Run configs, metrics, compute accounting, selected learning rates, and analysis artifacts are persisted.</p></div>
+        <div><strong>Statistical pipeline</strong><p>Hierarchical bootstrap, threshold model comparison, and guardrails around edge-of-grid hyperparameters.</p></div>
+      </div>
+
+      <div class="numbers" aria-label="Measured engineering totals">
+        <div><strong>53</strong><span>registered CPU runs</span></div>
+        <div><strong>448.5M</strong><span>training tokens recorded</span></div>
+        <div><strong>7.5 h</strong><span>registered CPU wall time</span></div>
+        <div><strong>$0</strong><span>billed compute so far</span></div>
+      </div>
+      <p class="source-note">Totals from <a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/PROJECT_STATUS.md">PROJECT_STATUS.md</a> and <a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/artifacts/compute_summary.total.json">the compute summary</a>.</p>
+    </div>
+  </section>
+
+  <section class="step" id="status" aria-labelledby="status-title">
+    <div class="rail">05 <b>Where it stands</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="status-title">The main answer is still pending, and the site says exactly what remains.</h2>
+        <p>
+          The project is blocked on GPU access for the approved calibration stage. The current hard maximum is $25. No paid GPU compute has been run.
+        </p>
+      </div>
+
+      <div class="status-ledger">
+        <div><span>Complete</span><strong>Literature verification</strong><p>Production ratios and nearby prior work checked; novelty claim narrowed where prior sweeps already exist.</p></div>
+        <div><span>Complete</span><strong>Experiment design</strong><p>Hypotheses, controls, stopping rules, validity risks, and statistical decision rules are written down.</p></div>
+        <div><span>Complete</span><strong>Reference implementations</strong><p>Mixers, hybrid stack, probes, training loop, registry, analysis and CI are built.</p></div>
+        <div><span>Measured</span><strong>CPU pilots</strong><p>MQAR and parity pilots exposed optimization and state-transition confounds.</p></div>
+        <div><span>Next</span><strong>GPU calibration</strong><p>Benchmark throughput, verify trainability, then decide GO / NO-GO for the main ratio sweep.</p></div>
+        <div><span>Pending</span><strong>Main capability curves</strong><p>No critical attention ratio is claimed until multi-seed GPU results exist.</p></div>
+      </div>
+
+      <div class="prose">
+        <h3>What would falsify the thesis</h3>
+        <p>
+          If every probe reaches ceiling with the same small number of attention layers, if apparent differences disappear under fair learning-rate tuning or state matching, or if the critical ratio does not move with context or memory load, that is the result.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="role" aria-labelledby="role-title">
+    <div class="rail">06 <b>My role</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="role-title">I am treating the repository as a research record, not a benchmark screenshot.</h2>
+        <p>
+          I framed the capability-level question, narrowed the literature claim, implemented and checked the reference models, built the deterministic probes and evaluation pipeline, recorded failed pilot interpretations, widened the hyperparameter search when it was unfair, and changed the experimental design when the pilots exposed confounds.
+        </p>
+        <p>
+          The repo keeps the original pilot conclusions next to their corrections instead of rewriting history after the fact.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="sources" aria-labelledby="sources-title">
+    <div class="rail">07 <b>Reproduce</b></div>
+    <div class="body">
+      <div class="prose">
+        <h2 id="sources-title">Everything on this page points back to the research record.</h2>
+      </div>
+
+      <div class="commands">
+        <div><span>Tests</span><code>make test</code></div>
+        <div><span>CPU smoke sweep</span><code>make smoke</code></div>
+        <div><span>CPU pilot</span><code>make train-small</code></div>
+        <div><span>Model matching</span><code>make match-report</code></div>
+        <div><span>Compute accounting</span><code>make compute-summary</code></div>
+      </div>
+
+      <ul class="sources">
+        <li><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/docs/EXPERIMENT_DESIGN.md">Experimental design</a> — hypotheses, ratios, probes, statistics, stopping rules, validity risks.</li>
+        <li><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/docs/DECISIONS.md">Decisions and substitutions</a> — every material departure from the original plan.</li>
+        <li><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/research/experiment_log/2026-09-30_06_pilot_v4_result.md">MQAR pilot log</a> — original reading, LR corrections, final pilot interpretation.</li>
+        <li><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/research/experiment_log/2026-10-01_07_parity_result.md">Parity pilot log</a> — measured values and failure classification.</li>
+        <li><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need/blob/HEAD/PROJECT_STATUS.md">Project status</a> — current gate, measured totals, next actions.</li>
+        <li><a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need">Repository</a> — source, tests, configs, artifacts and figures.</li>
+      </ul>
+
+      <p class="small-note">This page deliberately separates measured pilot findings from hypotheses and planned GPU work. No production-model capability claim is inferred from the CPU pilots.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot frame">
+  <span>Mohamed El Khoudimi</span>
+  <nav>
+    <a href="https://github.com/mtk1606/How-Much-Attention-Do-You-Actually-Need">GitHub</a>
+    <a href="#main">Back to top</a>
+  </nav>
+</footer>
+
+<script src="./app.js" defer></script>
+</body>
+</html>
