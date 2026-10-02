@@ -4,7 +4,9 @@
 
 How many softmax-attention layers does a hybrid sequence model need, and does the answer change with the capability being measured?
 
-**Status: no capability result yet.** The infrastructure is built and tested, and the first CPU pilot is running. This README will lead with the main figure and measured findings once they exist; until then it describes what is built and what is planned. Live state: [`PROJECT_STATUS.md`](PROJECT_STATUS.md).
+**Status: no final capability curve yet.** The infrastructure is built and tested; measured CPU pilots are recorded, and the main GPU sweep is pending. Live state: [`PROJECT_STATUS.md`](PROJECT_STATUS.md).
+
+**Research explainer:** https://mtk1606.github.io/How-Much-Attention-Do-You-Actually-Need/
 
 ## Why this question
 
