@@ -24,7 +24,7 @@ The two pilot figures are referenced from `figures/` in the repository. The GitH
 
 ## Publishing
 
-The workflow in `.github/workflows/pages.yml` deploys the site on pushes to `main` or the current project branch and can also be run manually.
+The workflow in `.github/workflows/pages.yml` deploys the site on pushes to `main` and can also be run manually.
 
 In GitHub:
 1. Settings → Pages
