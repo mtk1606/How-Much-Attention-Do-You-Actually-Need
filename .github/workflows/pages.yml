@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - "claude/zen-dirac-waz0tr"
     paths:
       - "site/**"
       - "figures/**"
